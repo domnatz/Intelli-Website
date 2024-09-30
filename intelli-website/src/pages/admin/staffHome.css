@@ -1,0 +1,48 @@
+/* Ensures the body has the correct background color */
+body {
+    background-color: #F7EEDD;
+    margin: 0; /* Remove default margin */
+}
+
+/* Styles for the main container */
+.Staff-home {
+    display: flex;
+    flex-direction: row; /* Align sidebar and content horizontally */
+}
+
+/* Ensure the content takes the remaining space */
+.content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; /* Optional padding */
+}
+
+/* Styles for the image */
+.intelliH {
+    width: 100%;
+    max-width: 900px; /* Maximum width of the image */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 20px; /* Adjust the radius as needed */
+    object-fit: cover;
+    margin-left: 280px;
+    margin-top: 100px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .Staff-home {
+        flex-direction: column; /* Stack sidebar and content vertically */
+    }
+
+    .sidebar {
+        width: 100%; /* Sidebar takes full width on smaller screens */
+        height: auto; /* Adjust height accordingly */
+        position: relative; /* Allow the sidebar to expand vertically */
+    }
+
+    .content {
+        margin-top: 20px; /* Add margin-top to space content from the sidebar */
+    }
+}

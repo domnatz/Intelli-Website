@@ -1,0 +1,124 @@
+header {
+    background-color: #94C5B5;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+h1, h2 {
+    color: #3F4662;
+}
+
+.Appointment-pg-cnt {
+    background: #F7EEDD;
+}
+
+.Accordion-grp {  
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.SLPBook, .OTBook {
+    color: #3F4662;
+    background: #F6EFED;
+    width: 90%;
+    padding: 5px;
+    margin: 10px;
+    justify-content: center;
+    text-align: justify;
+    border-radius: 20px;
+}
+
+.book-cnt {
+    margin: 30px;
+}
+
+.btn-container {
+    text-align: right;
+}
+.book-btn {
+    width: 70px;
+    height: 30px;
+    padding: 5px;
+    background: #2D848B;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bolder;
+}
+    .book-btn:hover {
+        background-color: #94C5B5;
+        border-color: #2D848B;
+    }
+
+.chooseTimeDate {
+    display: flex;
+    flex-direction: row;
+}
+
+.chooseDate{
+    width: 70%;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.Time {
+    background-color: #F6EFED;
+    width: 200px;
+    margin: 5px;
+}
+
+.Time.selected {
+    background-color: #2D848B;
+    border-color: #3F4662;
+    color: white;
+}
+
+.TherapistAvail {
+    display: flex;
+    justify-content: center;
+}
+.AvailTherapist {
+    background-color: #F6EFEDED;
+    width: 80%;
+    margin: 5px;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.continue-cnt {
+    display: flex;
+    text-align: right;
+    justify-content: right;
+    margin-right: 100px;
+}
+
+.continue-btn {
+    width: 200px;
+    height: 50px;
+    padding: 5px;
+    background: #2D848B;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 25px;
+    font-weight: bolder;
+}
+
+    .continue-btn:hover {
+        background-color: #94C5B5;
+        border-color: #2D848B;
+    }
+
+.Time.selected {
+        background-color: #1d3f66; /* Or any darker color you prefer */
+        color: white; 
+      }

@@ -1,0 +1,110 @@
+body{
+  background-color: #94C5B5;
+}
+
+.signup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.signup-box {
+  background-color: #f7eedd;
+  padding-bottom: 1rem;
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Outer shadow */
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  
+}
+
+.signup-box h2 {
+  color: #3F4662;
+  font-size: 35px;
+margin-top: 5px;
+margin-bottom: 10px;
+}
+
+.signup-box label {
+ display: block;
+ font-weight: bold;
+ color: #3F4662;
+ text-align: left;
+ 
+}
+.signup-box input {
+  padding: 0.6rem;
+  border: 1px solid #2D848B;
+  border-radius: 20px;
+  width: 80%;
+  box-sizing: border-box; 
+  margin-right: 30px;
+  margin-left: 30px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); 
+}
+
+.signup-box select {
+  padding: 0.5rem;
+  border: 1px solid #2D848B;
+  color:#3F4662;
+  border-radius: 20px;
+  width: 80%;
+  box-sizing: border-box; 
+  margin-right: 30px;
+  margin-left: 30px;
+}
+
+.name{
+  margin-left:60px;
+}
+
+.contactnumber{
+  margin-left: 60px;
+}
+
+.relationship{
+  margin-left: 60px;
+}
+
+.role{
+  margin-left: 40px;
+}
+
+.username{
+  margin-left: 60px;
+}
+
+.email{
+  margin-left: 60px;
+}
+
+.email{
+  margin-left: 60px;
+}
+
+.password{
+  margin-left: 60px;
+}
+
+.role{
+margin-left: 60px;
+}
+
+button {
+  width: 45%;
+  padding: 0.65rem;
+  background-color: #2D848B;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: bolder;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #94C5B5;
+}
