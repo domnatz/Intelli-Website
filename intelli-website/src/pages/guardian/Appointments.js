@@ -34,7 +34,7 @@ const CustomAccordion = styled(Accordion)({
 });
 
 
-export default function Appointments({ therapyType }) { // Destructure therapyType from props
+export default function Appointments({ therapyType, isLoggedIn, onLogout  }) { // Destructure therapyType from props
   const [activeForm, setActiveForm] = useState(null);
   const [expanded, setExpanded] = useState(null);
   const [selectedTime, setSelectedTime] = useState('');
