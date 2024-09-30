@@ -31,9 +31,6 @@ mongoose.connect(process.env.MONGODB_CONNECTION)
 app.use(express.json());
 app.use(cors());
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../intelli-website/build'))); 
-}
 // User routes
 app.post('/api/users', async (req, res) => {
   try {
@@ -483,11 +480,6 @@ app.post('/api/schedules', async (req, res) => {
 
 
 // Catch-all route to serve the index.html for client-side routing (for production)
-if (process.env.NODE_ENV === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../intelli-website/build', 'index.html')); 
-  });
-}
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
   next(); // Make sure to call next() to pass control to the next middleware/route handler
