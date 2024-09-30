@@ -2,7 +2,7 @@
     "version": 2,
     "builds": [
       { 
-        "src": "client/build/", 
+        "src": "intelli-website/build/", 
         "use": "@vercel/static"
       },
       {
