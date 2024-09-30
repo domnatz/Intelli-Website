@@ -11,7 +11,7 @@ export default function TherapistSchedule() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch('http://localhost:3001/api/therapist-schedule'); 
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/therapist-schedule`); 
         console.log('Response:', response);
 
         if (!response.ok) {

@@ -22,7 +22,8 @@ export default function LoginForm() {
     setError(null); 
 
     try {
-      const response = await fetch('http://localhost:3001/api/login', { 
+      console.log('API URL:', `${process.env.REACT_BACKEND_API}/api/login`);
+      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/login`,  { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

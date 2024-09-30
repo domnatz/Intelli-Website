@@ -122,7 +122,7 @@ const handleSubmitAppointment = async () => {
     // 1. Save patient data (if new patient) or update existing patient
     let patientId = patientData?._id;
     if (!patientId) {
-        const savePatientResponse = await fetch('http://localhost:3001/api/patients', {
+        const savePatientResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/patients`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(patientData) // Send the full patientData here
@@ -162,7 +162,7 @@ const handleSubmitAppointment = async () => {
     if (patientId) {
       console.log("currentTherapyType used for appointment creation:", currentTherapyType); 
 
-      const createAppointmentResponse = await fetch('http://localhost:3001/api/appointments', {
+      const createAppointmentResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -208,7 +208,7 @@ const submitAssessmentData = async (patientData) => {
 
     try {
         // 1. First, create a new patient record (POST request)
-        const createPatientResponse = await fetch('http://localhost:3001/api/patients', {
+        const createPatientResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/patients`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -225,7 +225,7 @@ const submitAssessmentData = async (patientData) => {
         setPatientId(newPatientId);
 
         // 2. Now, update the assessment data for this new patient (PUT request)
-        const updateAssessmentResponse = await fetch(`/http://localhost:3001/api/patients/${newPatientId}/assessment`, {
+        const updateAssessmentResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${newPatientId}/assessment`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

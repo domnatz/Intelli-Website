@@ -66,7 +66,7 @@ const scheduleMapping = {
   useEffect(() => {
     const fetchTherapists = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/therapists'); 
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/therapists`); 
         if (!response.ok) {
           throw new Error('Error fetching therapists');
         }
@@ -141,7 +141,7 @@ const scheduleMapping = {
     console.log("Schedule Data to be sent:", scheduleData);
 
     try {
-      const response = await fetch('http://localhost:3001/api/schedules', {
+      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/schedules`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -201,7 +201,7 @@ const scheduleMapping = {
     };
 
     try {
-      const response = await fetch('http://localhost:3001/api/therapists', { 
+      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/therapists`, { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

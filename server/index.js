@@ -8,12 +8,13 @@ const Patient = require('./models/patient');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const path = require('path');
-
 const app = express();
-const PORT = process.env.PORT || 3001;
 
+const PORT = process.env.PORT || 3001;
+const dotenv = require('dotenv');
+dotenv.config()
 // Connect to MongoDB 
-mongoose.connect('mongodb+srv://janlnato:domNATZ02@intellispeech.q35kg.mongodb.net/Intelli-Website')
+mongoose.connect(process.env.MONGODB_CONNECTION)
   .then(() => console.log('Connected to MongoDB (Intelli-Website database)'))
   .catch(err => console.error('Error connecting to MongoDB:', err));
 

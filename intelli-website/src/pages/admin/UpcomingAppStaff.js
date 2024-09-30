@@ -12,7 +12,7 @@ export default function UpcomingAppStaff() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/appointments'); 
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`); 
         if (!response.ok) {
             throw new Error('Error fetching appointments'); 
           }
