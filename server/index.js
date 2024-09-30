@@ -29,9 +29,12 @@ mongoose.connect(process.env.MONGODB_CONNECTION)
 
 // Middleware
 app.use(express.json());
-app.use(cors());
+
 
 // User routes
+app.get('/', (req, res) => {
+  res.send('Backend is working!'); 
+});
 app.post('/api/users', async (req, res) => {
   try {
     const { username, email_address, password, role } = req.body;
