@@ -13,13 +13,22 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { Box, Typography } from '@mui/material';
 
 export default function Sidebar() {
+
+  const handleLogout = () => {
+    // 1. Clear user session data (replace with your actual implementation)
+    localStorage.removeItem('userToken'); // Example using local storage
+
+    // 2. Redirect to login page (replace '/login' with your actual login route)
+    window.location.href = '/login'; 
+  }
+
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
         <img src={intelli} alt="IntelliSpeech" className="intelli" />
       </div>
 
-       {/* HOME*/}
+      {/* HOME*/}
       <ul className="sidebar-menu">
         <li>
           <Link to="/StaffHome" className="sidebar-link">
@@ -30,7 +39,7 @@ export default function Sidebar() {
           </Link>
         </li>
 
-       {/* APPOINTMENTS */}
+        {/* APPOINTMENTS */}
         <li>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <EventNoteIcon sx={{ mr: 3 }} />
@@ -50,7 +59,7 @@ export default function Sidebar() {
           </ul>
         </li>
 
-       {/* PATIENT PROFILES */}
+        {/* PATIENT PROFILES */}
         <li>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <RecentActorsIcon sx={{ mr: 3 }} />
@@ -58,7 +67,7 @@ export default function Sidebar() {
           </Box>
         </li>
 
-       {/* PROGRESS REPORT*/}
+        {/* PROGRESS REPORT*/}
         <li>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <PublishedWithChangesIcon sx={{ mr: 3 }} />
@@ -66,7 +75,7 @@ export default function Sidebar() {
           </Box>
         </li>
 
-       {/* SCHEDULE MANAGER */}
+        {/* SCHEDULE MANAGER */}
         <li>
           <Link to="/ScheduleManager" className="sidebar-link">
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -76,7 +85,7 @@ export default function Sidebar() {
           </Link>
         </li>
 
-       {/* MONTHLY REPORT */}
+        {/* MONTHLY REPORT */}
         <li>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <AddchartIcon sx={{ mr: 3 }} />
@@ -93,8 +102,8 @@ export default function Sidebar() {
             </Box>
           </li>
 
-         {/* User Profile and Logout */}
-          <li>
+          {/* User Profile and Logout */}
+          <li onClick={handleLogout}> 
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <LogoutOutlinedIcon sx={{ mr: 3 }} />
               <Typography variant="p">Logout</Typography>

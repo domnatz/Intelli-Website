@@ -265,6 +265,12 @@ const submitAssessmentData = async (patientData) => {
         <IconButton>
           <PersonIcon sx={{ color: '#3F4662', fontSize: 40 }} />
         </IconButton>
+
+        {isLoggedIn && ( // Conditionally render logout button
+          <button className="logout-btn" onClick={onLogout}>
+            Logout
+          </button>
+        )} 
       </header>
 
       <main>

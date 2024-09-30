@@ -85,8 +85,15 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // In a real app, you'd generate and send an authentication token/session here
-    res.json({ message: 'Login successful!', user }); 
+    // Include only necessary user information and the role in the response
+    res.json({ 
+      message: 'Login successful!', 
+      user: { 
+        id: user._id, // Or another unique identifier
+        username: user.username, 
+        role: user.role // Explicitly include the user's role
+      }
+    }); 
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Internal Server Error' });

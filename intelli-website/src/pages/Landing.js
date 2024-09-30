@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Landing.css';
 
@@ -6,11 +7,13 @@ import CallIcon from '@mui/icons-material/Call';
 import PlaceIcon from '@mui/icons-material/Place';
 import EmailIcon from '@mui/icons-material/Email';   
 
+
 import InstagramIcon from '@mui/icons-material/Instagram';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import   
  TelegramIcon from '@mui/icons-material/Telegram';
+
 import   
  Intellispeech from '../images/IntelliSpeech.png';
 import iMessageIcon from '../images/imessage.svg';
@@ -25,16 +28,9 @@ import Photo1 from '../images/Photo01.png';
 import Photo2 from '../images/Photo02.png';
 import Photo3 from '../images/Photo03.png';
 
-export default function Landing() {
+export default function Landing({ isLoggedIn, onLogout  }) { 
   const [activeSection, setActiveSection] = useState('home');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = localStorage.getItem('authToken');   
-
-    setIsLoggedIn(!!token); 
-  }, []);
 
   const handleBookAppointmentClick = () => {
     if (isLoggedIn) {
@@ -43,12 +39,6 @@ export default function Landing() {
       localStorage.setItem('intendedDestination', '/appointment'); 
       navigate('/login');
     }
-  };
-
-  const handleLogoutClick = () => {
-    localStorage.removeItem('authToken');
-    setIsLoggedIn(false);
-    navigate('/'); 
   };
 
   const renderSection = () => {
@@ -80,11 +70,13 @@ export default function Landing() {
         <button className="apt-btn" onClick={handleBookAppointmentClick}>
           Book an Appointment 
         </button>
-        {isLoggedIn && ( // Conditionally render the logout button
-          <button className="logout-btn" onClick={handleLogoutClick}>
+
+        {isLoggedIn && ( 
+          <button className="logout-btn" onClick={onLogout}> {/* Call onLogout prop */}
             Logout
           </button>
         )}
+
       </header>
 
       <main>
@@ -124,6 +116,7 @@ export default function Landing() {
     </div>
   );
 }
+
 function Home() {
     return <div className="Land">
         <img className="Team" src={Team} alt=""/>
