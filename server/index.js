@@ -31,11 +31,9 @@ mongoose.connect(process.env.MONGODB_CONNECTION)
 app.use(express.json());
 app.use(cors());
 
-// Serve static files from the React frontend build folder (for production)
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'client/build')));
+  app.use(express.static(path.join(__dirname, '../intelli-website/build'))); 
 }
-
 // User routes
 app.post('/api/users', async (req, res) => {
   try {
