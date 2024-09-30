@@ -13,6 +13,15 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const dotenv = require('dotenv');
 dotenv.config()
+
+const corsOptions = {
+  origin: ["https://intelliwebsite-backend.vercel.app"],
+  methods: ["POST", "GET"],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+
 // Connect to MongoDB 
 mongoose.connect(process.env.MONGODB_CONNECTION)
   .then(() => console.log('Connected to MongoDB (Intelli-Website database)'))
