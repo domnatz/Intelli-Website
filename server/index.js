@@ -15,7 +15,7 @@ const dotenv = require('dotenv');
 dotenv.config()
 
 const corsOptions = {
-  origin: ["https://intelliwebsite-backend.vercel.app"],
+  origin: ["https://intelliwebsite.vercel.app"],
   methods: ["POST", "GET"],
   credentials: true
 };
