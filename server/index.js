@@ -487,7 +487,7 @@ app.post('/api/schedules', async (req, res) => {
 // Catch-all route to serve the index.html for client-side routing (for production)
 if (process.env.NODE_ENV === 'production') {
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../intelli-website/build', 'index.html')); 
   });
 }
 app.use((req, res, next) => {
