@@ -30,7 +30,6 @@ mongoose.connect(process.env.MONGODB_CONNECTION)
 // Middleware
 app.use(express.json());
 
-
 // User routes
 app.get('/', (req, res) => {
   res.send('Backend is working!'); 
@@ -140,9 +139,27 @@ app.get('/api/therapist-schedule', async (req, res) => {
   }
 });
 
-// ... other imports
+// Delete Schedule Route
+app.delete('/api/schedules/:scheduleId', async (req, res) => {
+  try {
+    const scheduleId = req.params.scheduleId;
 
-// ... other routes
+    // Find and delete the schedule
+    const deletedSchedule = await Schedule.findByIdAndDelete(scheduleId);
+
+    if (!deletedSchedule) {
+      return res.status(404).json({ error: 'Schedule not found' });
+    }
+
+    // Optionally, you might want to remove the schedule ID from the therapist's schedule array
+
+    res.json({ message: 'Schedule deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting schedule:', error);
+    res.status(500).json({ error: 'Internal Server Error'   
+ });
+  }
+});
 
 // Appointment routes
 // GET route to fetch all appointments

@@ -1,17 +1,22 @@
 header{
-    background-color: #94C5B5;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-
-nav{
-  font-size: 15px;
-  color: white;
+  background-color: #94C5B5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  height: 80px;
 }
 
-button {
+
+nav{
+font-size: 13px;
+color: white;
+display: flex;
+gap: 1.5rem;
+}
+
+
+.landingli {
   background: none;
   border: none;
   padding: 10px;
@@ -19,280 +24,319 @@ button {
   font: inherit;
   color: inherit;
   cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: color 0.3s ease;
+  list-style-type: none;
+  }
+
+li:hover{
+background-color:  #2D848B;
 }
+
+
 main {
-  background: #F7EEDD;
+background: #F7EEDD;
 }
+
 
 h1 {
-  text-align: center;
+text-align: center;
 }
+
 
 footer {
-  background: #94C5B580;
-  height: 300px;
+background: #94C5B580;
+height: 300px;
 }
+
 
 .companyname {
-  width: 200px;
-  height:40px;
-  margin: 20px;
-  margin-bottom: 0px;
+width: 200px;
+height:40px;
+margin: 20px;
+margin-bottom: 0px;
 }
+
 
 .foot {
-  display: flex;
-  flex-direction: row;
-  
+display: flex;
+flex-direction: row;
+
 }
 .Information {
-  margin: 20px;
-  width:50%;
+margin: 20px;
+width:50%;
 }
+
 
 .info {
-  display: flex;
-  flex-direction: row;
+display: flex;
+flex-direction: row;
 }
-  .info p {
-    margin-left: 20px;
-  }
+.info p {
+  margin-left: 20px;
+}
+
 
 .icons {
-  display: flex;
-  justify-content: center;
-   margin: 10px;
+display: flex;
+justify-content: center;
+ margin: 10px;
 }
+
 
 .Logo {
-  width: 10%;
-  height: 10%;
+width: 80px; /* Adjust size as necessary */
+height: auto;
 }
+
 
 .Land {
-  height: 1500px;
+height: 1500px;
 }
+
 
 .landing-cnt {
-  margin: 10%;
-  margin-top: 0px;
-  margin-bottom: 0px;
-  text-align: justify;
+margin: 10%;
+margin-top: 0px;
+margin-bottom: 0px;
+text-align: justify;
 }
+
 
 .Team {
-  width: 80%;
-  height: 30%;
-  border-radius: 30px;
-  margin: 10%;
-  margin-bottom: 20px;
+width: 80%;
+height: 30%;
+border-radius: 30px;
+margin: 10%;
+margin-bottom: 20px;
+max-width: 80%;
+height: 30%;
 }
 
-.TherapistList {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+
+.Therapists{
+margin-top: 80px;
 }
+.TherapistList {
+display: flex;
+flex-direction: row;
+align-items: center;
+justify-content: center;
+margin-top: 10px ;
+}
+
 
 .Everyone, .SLPThera, .LSTeach {
-  width: 20%;
-  height: 20%;
-  border-radius: 40px;
-  margin: 5%;
+width: 20%;
+height: 20%;
+border-radius: 40px;
+margin: 3%;
+box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
+
 
 .apt-btn {
-  width: 250px;
-  height: 50px;
-  padding: 5px;
-  background: #2D848B;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bolder;
-  margin-top: 20px;
-}
-  
-  .apt-btn:hover {
-    background-color: #94C5B5;
-    border: 3px solid;
-    border-color: #2D848B;
-  }
+width: 250px;
+height: 50px;
+padding: 5px;
+background: #2D848B;
+color: #fff;
+border: none;
+border-radius: 20px;
+cursor: pointer;
+font-size: 20px;
+font-weight: bolder;
+margin-bottom:20px;
+margin-left: 50px;
 
-.abt-cnt {
-  display: flex;
-  justify-content: end;
-  margin-right: 10%;
+
 }
 
-.abt-btn {
-  width: 400px;
-  height: 50px;
-  padding: 5px;
-  background-color: #2D848B;
-  color: #fff;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bolder;
-  margin-top: 10px;
-}
-
-.abt-btn:hover {
+.apt-btn:hover {
   background-color: #94C5B5;
+  border: 3px solid;
+  border-color: #2D848B;
 }
+
+
+p{
+color: #3F4662;
+font-weight: bold;
+}
+
+
 
 .AbtUs {
-  height: 1500px;
+height: 1500px;
+
+
 }
+
 
 .Advocacy {
-  padding: 10%;
-  padding-top: 5%;
-  text-align: justify;
+padding: 10%;
+padding-top: 5%;
+text-align: justify;
 }
+
 
 .PartnerinProgress {
-  background: #C66B6A80;
-  width: 75%;
-  height: 400px;
-  border-radius: 30px;
-  margin-bottom: 20px;
-  text-align: center;
-  padding: 30px;
-  margin-left: 10%;
+background: #C66B6A80;
+width: 75%;
+height: 400px;
+border-radius: 30px;
+margin-bottom: 20px;
+text-align: center;
+padding: 30px;
+margin-left: 10%;
 }
+
 
 .Progress {
-  display: flex;
-  flex-direction: row;
-  text-align: justify;
-  font-size: 20px;
+display: flex;
+flex-direction: row;
+text-align: justify;
+font-size: 20px;
 }
+
 
 .Partnerprog {
-  width:40%;
-  height: 40%;
-  padding-right: 30px;
+width:40%;
+height: 40%;
+padding-right: 30px;
 }
+
 
 .MisVis {
-  display: flex;
-  flex-direction: row;
-  text-align: center;
-  width: 80%;
-  margin: 10%;
+display: flex;
+flex-direction: row;
+text-align: center;
+width: 80%;
+margin: 10%;
 }
+
 
 .Mission, .Vision {
-  background: #F8F2F2;
-  height: 200px;
-  border-radius: 30px;
-  padding: 20px;
+background: #F8F2F2;
+height: 200px;
+border-radius: 30px;
+padding: 20px;
+box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
+
 
 .Mission {
-  margin-right: 5%;
+margin-right: 5%;
 }
+
 
 .Services {
-  height: 1000px;
-  text-align: center;
-  justify-content: center;
-  padding: 10%;
-  padding-top: 5%;
+height: 1000px;
+text-align: center;
+justify-content: center;
+padding: 10%;
+padding-top: 5%;
 }
+
 
 .SLPService, .OTService {
-  background: #C66B6A80;
-  height: 300px;
-  border-radius: 30px;
-  padding: 30px;
-  margin-bottom: 5%;
-  margin-top: 5%;
+background: #C66B6A80;
+height: 300px;
+border-radius: 30px;
+padding: 30px;
+margin-bottom: 5%;
+margin-top: 5%;
 }
+
 
 .SpeechPath, .Occupational {
-  background: #FFFFFFE8;
-  height: 300px;
-  border-radius: 30px;
-  display: flex;
-  flex-direction: row;
+background: #FFFFFFE8;
+height: 300px;
+border-radius: 30px;
+display: flex;
+flex-direction: row;
 }
+
 
 .photos {
-  width: 100%;
-  height: 100%;
+width: 100%;
+height: 100%;
 }
+
 
 .photo {
-  width: 40%;
+width: 40%;
 }
+
 
 .Desc {
-  width: 60%;
-  margin-left: 5%;
-  margin-right: 5%;
+width: 60%;
+margin-left: 5%;
+margin-right: 5%;
 }
+
 
 .btn-cnt {
-  display: flex;
-  justify-content: end;
+display: flex;
+justify-content: end;
 }
+
 
 .apt-btns {
-  width: 250px;
-  height: 40px;
-  padding: 5px;
-  background: #2D848B;
-  color: #fff;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 20px;
-  font-weight: bolder;
-  margin-top: 20px;
+width: 250px;
+height: 40px;
+padding: 5px;
+background: #2D848B;
+color: #fff;
+border: none;
+border-radius: 20px;
+cursor: pointer;
+font-size: 20px;
+font-weight: bolder;
+margin-top: 20px;
 }
-  
-  .apt-btns:hover {
-    background-color: #94C5B5;
-    border-color: #2D848B;
-  }
+
+.apt-btns:hover {
+  background-color: #94C5B5;
+  border-color: #2D848B;
+}
+
 
 .Contact {
-  height: 900px;
+height: 900px;
 }
 .con {
-  background: #C66B6A80;
-  width: 60%;
-  height: 120px;
-  border-radius: 30px;
-  margin-bottom: 20px;
-  text-align: center;
-  padding: 30px;
-  margin-left: 10%;
+background: #C66B6A80;
+width: 60%;
+height: 120px;
+border-radius: 30px;
+margin-bottom: 20px;
+text-align: center;
+padding: 30px;
+margin-left: 10%;
 }
+
 
 .icons2 {
-  display: flex;
-  justify-content: center;
-   margin: 10px;
+display: flex;
+justify-content: center;
+ margin: 10px;
 }
 .allcontacts {
-  display: flex;
-  flex-direction: row;
+display: flex;
+flex-direction: row;
 }
+
 
 .contacts {
-  width: 60%;
+width: 60%;
 }
 
+
 .otherContacts {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+display: flex;
+flex-direction: column;
+justify-content: center;
 }

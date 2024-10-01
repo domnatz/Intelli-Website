@@ -61,11 +61,12 @@ export default function Landing({ isLoggedIn, onLogout  }) {
       <header>
         <img className="Logo" src={logo} alt="Logo" />
         <nav>
-          <button onClick={() => setActiveSection('home')}>Home</button>
-          <button onClick={() => setActiveSection('about')}>About Us</button>
-          <button onClick={() => setActiveSection('services')}>Our Services</button>
-          <button onClick={() => setActiveSection('contact')}>Contact Us</button>
+          <li className="landingli"onClick={() => setActiveSection('home')}>Home</li>
+          <li className="landingli"onClick={() => setActiveSection('about')}>About Us</li>
+          <li className="landingli"onClick={() => setActiveSection('services')}>Our Services</li>
+          <li className="landingli"onClick={() => setActiveSection('contact')}>Contact Us</li>
         </nav>
+       
 
         <button className="apt-btn" onClick={handleBookAppointmentClick}>
           Book an Appointment 
@@ -133,9 +134,6 @@ function Home() {
                 At IntelliSpeech, we pride ourselves on employing certified Speech-Language Pathologists and Licensed Occupational Therapists who bring their expertise 
                 and compassion to every session. Our team is committed to delivering high-quality care through innovative methods and a client-centered approach.
             </p>
-        </div>
-        <div className="abt-cnt">
-            <button className="abt-btn"> Meet the Heart Behind the Work </button>
         </div>
 
         <div className="Therapists">
@@ -218,9 +216,7 @@ function OurServices() {
                         (speech and language impairments), cognitive-communication disorders, voice disorder across 
                         the lifespan.
                     </p>
-                    <div className="btn-cnt">
-                        <button className="apt-btns"> Book an Appointment </button>
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -236,9 +232,7 @@ function OurServices() {
                         Involves the therapeutic use of everyday activities, or occupations, to treat the physical, mental, 
                         developmental. and emotional ailments that impact patient's ability to perform daily tasks.
                     </p>
-                    <div className="btn-cnt">
-                        <button className="apt-btns"> Book an Appointment </button>
-                    </div>
+                   
                 </div>
             </div>
         </div>

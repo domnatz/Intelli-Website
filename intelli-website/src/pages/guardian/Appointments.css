@@ -113,6 +113,20 @@ h1, h2 {
     font-weight: bolder;
 }
 
+.apt-list {
+    background: none;
+    border: none;
+    padding: 10px;
+    margin: 30px;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+    list-style-type: none;
+    }
+
     .continue-btn:hover {
         background-color: #94C5B5;
         border-color: #2D848B;

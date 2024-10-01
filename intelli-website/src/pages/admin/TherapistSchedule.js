@@ -34,40 +34,76 @@ export default function TherapistSchedule() {
     fetchData();
   }, []); // Empty dependency array ensures this runs once on mount
 
-  return (
-    <div className="therapist-schedule-layout">
-      <Sidebar />
-      <div className="therapist-schedule-content">
-        <h6 className="therapist-schedule-title">Therapist Schedule</h6>
-        <div className="therapist-schedule-container">
+  const handleDeleteSchedule = async (scheduleId) => {
+    if (window.confirm("Are you sure you want to delete this schedule?")) {
+        // Confirmation dialog
+        try {
+            const response = await fetch(
+                `${process.env.REACT_BACKEND_API}/api/schedules/${scheduleId}`,
+                {
+                    method: "DELETE",
+                }
+            );
 
-          {error && <div className="error-message">{error}</div>}
-          {isLoading && <div className="loading-indicator">Loading...</div>}
+            if (response.ok) {
+                // Update the scheduleData state to remove the deleted schedule
+                setScheduleData((prevScheduleData) =>
+                    prevScheduleData.filter(
+                        (schedule) => schedule._id !== scheduleId
+                    )
+                );
+            } else {
+                // Handle error (e.g., display an error message)
+                const errorData = await response.json();
+                console.error(
+                    "Error deleting schedule:",
+                    errorData.error || response.statusText
+                );
+            }
+        } catch (error) {
+            console.error("Error deleting schedule:", error);
+        }
+    }
+};
 
-          {!isLoading && !error && (
-            <table className="therapist-schedule-table">
-              <thead>
-                <tr>
-                  <th>Therapist Name</th>
-                  <th>Date</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
+
+return (
+  <div className="therapist-schedule-layout">
+    <Sidebar />
+    <div className="therapist-schedule-content">
+      <h6 className="therapist-schedule-title">Therapist Schedule</h6>
+      <div className="therapist-schedule-container">
+
+        {error && <div className="error-message">{error}</div>}
+        {isLoading && <div className="loading-indicator">Loading...</div>}
+
+        {!isLoading && !error && (
+          <table className="therapist-schedule-table">
+            <thead>
+              <tr>
+                <th>Therapist Name</th>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {scheduleData.map((schedule) => (
+                <tr key={schedule._id}>
+                  <td>{schedule.therapist_id?.therapist_name || 'Unknown'}</td>
+                  <td>{new Date(schedule.start_time).toLocaleDateString()}</td>
+                  <td>{new Date(schedule.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                  <td>{new Date(schedule.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                  <td>
+                    <button onClick={() => handleDeleteSchedule(schedule._id)}>Delete</button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {scheduleData.map((schedule) => (
-                  <tr key={schedule._id}>
-                    <td>{schedule.therapist_id?.therapist_name || 'Unknown'}</td> 
-                    <td>{new Date(schedule.start_time).toLocaleDateString()}</td> 
-                    <td>{new Date(schedule.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td> 
-                    <td>{new Date(schedule.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td> 
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 }
