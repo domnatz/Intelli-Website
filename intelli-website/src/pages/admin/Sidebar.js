@@ -30,8 +30,8 @@ export default function Sidebar() {
 
       {/* HOME*/}
       <ul className="sidebar-menu">
-        <li>
-          <Link to="/StaffHome" className="sidebar-link">
+      <li>
+          <Link to="/home" className="sidebar-link">
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <HomeIcon sx={{ mr: 3 }} />
               <Typography variant="p">Home</Typography>
