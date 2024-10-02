@@ -173,7 +173,7 @@ const handleSubmitAppointment = async () => {
           patient_id: patientId,
           patient_name: patientData.patient_name,
           appointment_type: currentTherapyType === 'slp' ? 'Speech Therapy' : 'Occupational Therapy', 
-          appointment_status: 'Scheduled', 
+          appointment_status: 'Pending', 
           // ... add other appointment-related data as needed
         })
       });
