@@ -308,8 +308,8 @@ const scheduleMapping = {
                 onChange={handleStartTimeChange}
               >
                 <MenuItem value="08:00">8:00am</MenuItem>
-                <MenuItem value="09:00">9:00am</MenuItem>
-                <MenuItem value="11:00">11:00am</MenuItem> 
+                <MenuItem value="10:00">10:00am</MenuItem>
+                <MenuItem value="13:00">1:00pm</MenuItem> 
                 {/* Add more time slots as needed */}
               </Select>
             </FormControl>
@@ -326,9 +326,9 @@ const scheduleMapping = {
                 label="Select End Time"
                 onChange={handleEndTimeChange}
               >
-                <MenuItem value="09:00">9:00am</MenuItem>
                 <MenuItem value="10:00">10:00am</MenuItem>
-                <MenuItem value="12:00">12:00pm</MenuItem> 
+                <MenuItem value="12:00">12:00pm</MenuItem>
+                <MenuItem value="15:00">3:00pm</MenuItem> 
                 {/* Add more time slots as needed */}
               </Select>
             </FormControl>
