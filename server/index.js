@@ -219,6 +219,29 @@ app.post('/api/therapists', async (req, res) => {
   }
 });
 
+app.delete('/api/therapists/:therapistId', async (req, res) => {
+  try {
+    const therapistId = req.params.therapistId;
+
+    // 1. Delete the therapist's associated schedules
+    await Schedule.deleteMany({ therapist_id: therapistId });
+
+    // 2. Delete the therapist
+    const deletedTherapist = await Therapist.findByIdAndDelete(therapistId);
+
+    if (!deletedTherapist) {
+      return res.status(404).json({ error: 'Therapist not found' });
+    }
+
+    res.json({ message: 'Therapist and associated schedules deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting therapist:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+
+
 app.post('/api/appointments', async (req, res) => {
   try {
       console.log('Received appointment data:', req.body);

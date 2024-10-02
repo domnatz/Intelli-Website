@@ -153,6 +153,7 @@ const scheduleMapping = {
         const newSchedule = await response.json(); 
         console.log('Schedule created successfully!', newSchedule);
         setSuccessMessage('Schedule assigned successfully!');
+        alert("Schedule assigned successfully!"); 
 
         // After creating a new schedule, refetch the therapists to update the list
         // fetchTherapists();
@@ -240,6 +241,41 @@ const scheduleMapping = {
     }
   };
 
+  const handleDeleteTherapist = async (therapistId) => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this therapist? This action cannot be undone."
+      )
+    ) {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_BACKEND_API}/api/therapists/${therapistId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (response.ok) {
+          // Update the therapists state to remove the deleted therapist
+          setTherapists((prevTherapists) =>
+            prevTherapists.filter((therapist) => therapist._id !== therapistId)
+          );
+          alert("Therapist deleted successfully!");
+        } else {
+          // Handle error (e.g., display an error message)
+          const errorData = await response.json();
+          console.error(
+            "Error deleting therapist:",
+            errorData.error || response.statusText
+          );
+        }
+      } catch (error) {
+        console.error("Error deleting therapist:", error);
+      }
+    }
+  };
+
+
   return (
     <div className="schedule-manager-layout">
       <Sidebar />
@@ -257,7 +293,7 @@ const scheduleMapping = {
             fontWeight: 'bold',
             '&:hover': { backgroundColor: '#94C5B5' }
           }}>
-            Add Therapist Info
+            Add Therapist
           </Button>
           <h4 className='therapist'>Therapist</h4>
           <Box sx={{ width: 410, borderColor: '#3F4662', marginBottom: 3, marginLeft: 4 }}>
@@ -333,6 +369,25 @@ const scheduleMapping = {
               </Select>
             </FormControl>
           </Box>
+
+           {/* Delete button next to the Select */}
+           <Button 
+    variant="contained" 
+    color="error" // Use color="error" for red
+    onClick={() => handleDeleteTherapist(selectedTherapist)} 
+    disabled={!selectedTherapist} 
+    sx={{ 
+        backgroundColor: '#D14D4D', // Red background color
+        borderRadius: '18px',
+        fontSize: '12px',
+        fontWeight: 'bold',
+        marginLeft: '10px',
+        marginTop: '10px',
+        '&:hover': { backgroundColor: '#E79E9E' } // Lighter red on hover
+    }}
+>
+    Delete Therapist
+</Button>
 
           <button type="submit" className="assign" onClick={handleSubmit}>Assign</button>
 
