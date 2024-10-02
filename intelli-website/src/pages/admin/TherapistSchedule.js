@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './TherapistSchedule.css';
+import { Button } from '@mui/material';
 import Sidebar from './Sidebar';
 
 export default function TherapistSchedule() {
@@ -95,7 +96,19 @@ return (
                   <td>{new Date(schedule.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   <td>{new Date(schedule.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
                   <td>
-                    <button onClick={() => handleDeleteSchedule(schedule._id)}>Delete</button>
+                  <Button
+  variant="contained"
+  onClick={() => handleDeleteSchedule(schedule._id)}
+  sx={{
+    backgroundColor: "red", // Directly set the background color to red
+    color: "white", // Set text color to white for contrast
+    "&:hover": {
+      backgroundColor: "darkred", // Darker red on hover
+    },
+  }}
+>
+  Delete
+</Button>
                   </td>
                 </tr>
               ))}
