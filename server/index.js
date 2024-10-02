@@ -177,6 +177,51 @@ app.get('/api/appointments', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' }); 
   }
 });
+
+// PUT route to confirm an appointment
+app.put('/api/appointments/:appointmentId/confirm', async (req, res) => {
+  try {
+    const appointmentId = req.params.appointmentId;
+
+    // Find the appointment and update its status to 'confirmed'
+    const updatedAppointment = await Appointment.findByIdAndUpdate(
+      appointmentId,
+      { appointment_status: 'Confirmed' }, // Update the correct field: appointment_status
+      { new: true } 
+    );
+
+    if (!updatedAppointment) {
+      return res.status(404).json({ error: 'Appointment not found' });
+    }
+
+    res.json(updatedAppointment);
+  } catch (error) {
+    console.error('Error confirming appointment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// DELETE route to delete an appointment
+app.delete('/api/appointments/:appointmentId', async (req, res) => {
+  try {
+    const appointmentId = req.params.appointmentId;
+
+    // Find and delete the appointment
+    const deletedAppointment = await Appointment.findByIdAndDelete(appointmentId);
+
+    if (!deletedAppointment) {
+      return res.status(404).json({ error: 'Appointment not found'   
+ });
+    }
+
+    res.json({ message: 'Appointment deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting appointment:', error);
+    res.status(500).json({   
+ error: 'Internal Server Error'   
+ });
+  }
+});
 // ... other routes
 // Therapist routes
 app.get('/api/therapists', async (req, res) => {

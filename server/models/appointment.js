@@ -23,7 +23,7 @@ const appointmentSchema = new mongoose.Schema({
   appointment_status: { 
     type: String, 
     required: true,
-    enum: ['Scheduled', 'Confirmed', 'Completed', 'Cancelled'] 
+    enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled'] 
   },
   appointment_notes: String,
   start_time: { type: Date, required: true },
