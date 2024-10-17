@@ -1,14 +1,11 @@
 import "./Signup.css";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; 
 
-export default function SignupForm() {
+export default function StaffRegistrationPage() {
     const [formData, setFormData] = useState({
         name: "",
         contact_number: "",
-        relationship_to_patient: "",
-        // Removed role: 'guardian',
         username: "",
         email_address: "",
         password: "",
@@ -18,17 +15,13 @@ export default function SignupForm() {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-
-    const navigate = useNavigate();
+    const navigate = useNavigate(); 
 
     const handleChange = (event) => {
         setFormData({
             ...formData,
             [event.target.name]: event.target.value,
         });
-    };
-    const handleNavigateToLogin = () => {
-        navigate("/LoginForm");
     };
 
     const handleSubmit = async (event) => {
@@ -45,10 +38,11 @@ export default function SignupForm() {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BACKEND_API}/api/users`,
+                `${process.env.REACT_BACKEND_API}/api/staff`, 
                 {
                     method: "POST",
                     headers: {
+                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(formData),
@@ -59,19 +53,17 @@ export default function SignupForm() {
 
             if (response.ok) {
                 const savedUser = await response.json();
-                console.log("Signup successful!", savedUser);
-                setSuccessMessage(
-                    "Signup successful! You can now log in."
-                );
+                console.log("Staff signup successful!", savedUser);
+                setSuccessMessage("Staff signup successful!");
                 setFormData({
                     name: "",
                     contact_number: "",
-                    relationship_to_patient: "",
                     username: "",
                     email_address: "",
                     password: "",
                     confirmPassword: "",
                 });
+                navigate('/home', { replace: true }); 
             } else {
                 try {
                     const errorData = await response.json();
@@ -100,9 +92,9 @@ export default function SignupForm() {
     };
 
     return (
-        <div className="signup-container">
+        <div className="signup-container"> 
             <div className="signup-box">
-                <h2>Sign up</h2>
+                <h2>Staff Sign up</h2>
 
                 {error && (
                     <div className="error-message">{error}</div>
@@ -114,7 +106,6 @@ export default function SignupForm() {
                 )}
 
                 <form onSubmit={handleSubmit}>
-                    {/* Input fields */}
                     <label htmlFor="name">Name:</label>
                     <input
                         type="text"
@@ -137,19 +128,6 @@ export default function SignupForm() {
                         value={formData.contact_number}
                         onChange={handleChange}
                         placeholder="Enter your contact number"
-                    />
-                    <br />
-
-                    <label htmlFor="relationship_to_patient">
-                        Relationship to Patient:
-                    </label>
-                    <input
-                        type="text"
-                        id="relationship_to_patient"
-                        name="relationship_to_patient"
-                        value={formData.relationship_to_patient}
-                        onChange={handleChange}
-                        placeholder="Your relationship to patient"
                     />
                     <br />
 

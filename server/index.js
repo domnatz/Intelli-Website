@@ -5,9 +5,10 @@ const Therapist = require('./models/therapist');
 const Appointment = require('./models/appointment');
 const Schedule = require('./models/schedule');
 const Patient = require('./models/patient');
+const Lesson = require('./models/lesson');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-const path = require('path');
+const jwt = require('jsonwebtoken'); 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
@@ -30,13 +31,53 @@ mongoose.connect(process.env.MONGODB_CONNECTION)
 // Middleware
 app.use(express.json());
 
-// User routes
+
 app.get('/', (req, res) => {
   res.send('Backend is working!'); 
 });
+
+// User routes
+const authenticateUser = async (req, res, next) => {
+  try {
+      console.log("Authorization header:", req.headers.authorization); 
+
+      const token = req.headers.authorization.split("")[1]; 
+      console.log("Extracted token:", token); 
+
+      const decodedToken = jwt.verify(
+          token,
+          "zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE" // Replace with your actual secret key or use an environment variable
+      );
+      console.log("Decoded token:", decodedToken); 
+
+      const user = await User.findById(decodedToken.userId);
+      console.log("User:", user); 
+
+      if (!user) { // Check only if the user exists
+          return res.status(403).json({ error: "Forbidden" });
+      }
+
+      req.user = user;
+      next();
+  } catch (error) {
+      console.error("Authentication error:", error);
+      res.status(401).json({ error: "Unauthorized" });
+  }
+};
+
+// Admin authorization middleware
+const isAdmin = (req, res, next) => {
+  if (req.user.role === "admin") {
+      next();
+  } else {
+      res.status(403).json({ error: "Forbidden" });
+  }
+};
+
+// User routes (modified for guardian-only signup)
 app.post('/api/users', async (req, res) => {
   try {
-    const { username, email_address, password, role } = req.body;
+    const { username, email_address, password } = req.body; 
 
     // Check if username or email already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email_address }] });
@@ -44,12 +85,36 @@ app.post('/api/users', async (req, res) => {
       return res.status(400).json({ error: 'Username or email already exists' });
     }
 
-    // Check if a staff account already exists 
-    if (role === 'staff') {
-      const existingStaff = await User.findOne({ role: 'staff' });
-      if (existingStaff) {
-        return res.status(400).json({ error: 'A staff account already exists' });
-      }
+    // Hash the password
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Always create a 'guardian' role user
+    const newUser = new User({
+      username,
+      email_address,
+      password: hashedPassword,
+      role: 'guardian', 
+    });
+
+    const savedUser = await newUser.save();
+    res.status(201).json(savedUser);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// New route for staff to create accounts (with role selection)
+app.post('/api/staff', authenticateUser, isAdmin, async (req, res) => { 
+  try {
+    // Include 'name' in the destructuring assignment
+    const { name, username, email_address, password, role } = req.body;
+
+    // Check if username or email already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email_address }] });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Username or email already exists' });
     }
 
     // Hash the password
@@ -57,8 +122,11 @@ app.post('/api/users', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const newUser = new User({
-      ...req.body,
-      password: hashedPassword 
+      name, // Include 'name' in the new user object
+      username,
+      email_address,
+      password: hashedPassword,
+      role: role || 'staff', 
     });
 
     const savedUser = await newUser.save();
@@ -84,13 +152,17 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Include only necessary user information and the role in the response
+    // Generate a JWT (after successful authentication)
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET_KEY || 'zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE'); 
+
+    // Include the JWT in the response
     res.json({ 
       message: 'Login successful!', 
+      token: token,  
       user: { 
-        id: user._id, // Or another unique identifier
+        id: user._id, 
         username: user.username, 
-        role: user.role // Explicitly include the user's role
+        role: user.role 
       }
     }); 
   } catch (error) {
@@ -98,6 +170,7 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
 // Therapist Schedule Route
 app.get('/api/therapist-schedule', async (req, res) => {
   try {
@@ -451,6 +524,204 @@ app.post('/api/patients', async (req, res) => {
       } else {
           return res.status(500).json({ error: 'Internal Server Error. Please check server logs for details.' });
       }
+  }
+});
+
+
+app.post('/api/lessons', async (req, res) => {
+  try {
+    console.log('Received lesson data:', req.body);  // Log the received data
+    const newLesson = new Lesson(req.body);
+    const savedLesson = await newLesson.save();
+    res.status(201).json(savedLesson);
+  } catch (error) {
+    console.error('Error saving lesson:', error);  // Log the complete error object
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ errors: validationErrors }); // Send validation errors
+    } 
+    res.status(500).json({ error: 'Failed to add lesson' });
+  }
+});
+app.get('/api/lessons', async (req, res) => {
+  try {
+    console.log('Fetching lessons...'); // Log when the route is accessed
+    const lessons = await Lesson.find(); 
+    res.json(lessons); 
+  } catch (error) {
+    console.error('Error fetching lessons:', error);
+    res.status(500).json({ error: 'Failed to fetch lessons' });
+  }
+});
+
+app.delete('/api/lessons/:lessonId', async (req, res) => {
+  try {
+    const lessonId = req.params.lessonId;
+    const deletedLesson = await Lesson.findByIdAndDelete(lessonId);
+
+    if (!deletedLesson) {
+      return res.status(404).json({ error: 'Lesson not found' });
+    }
+
+    // Fetch and return the updated list of lessons
+    const updatedLessons = await Lesson.find();
+    res.json(updatedLessons);
+  } catch (error) {
+    console.error('Error deleting lesson:', error);
+    res.status(500).json({ error: 'Failed to delete lesson' });
+  }
+});
+
+app.post('/api/patients/:patientId/assign-lesson', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const { 
+      lessonId, 
+      lesson_name, 
+      lesson_complexity, 
+      lesson_category, 
+      lesson_desc 
+    } = req.body;
+
+    const updatedPatient = await Patient.findByIdAndUpdate(
+      patientId,
+      {
+        $addToSet: {
+          assignedLessons: {
+            lessonId: lessonId,
+            lesson_name: lesson_name,
+            lesson_complexity: lesson_complexity,
+            lesson_category: lesson_category,
+            lesson_desc: lesson_desc,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedPatient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.json(updatedPatient);
+  } catch (error) {
+    console.error('Error assigning lesson:', error);
+    res.status(500).json({ error: 'Failed to assign lesson' });
+  }
+});
+
+app.delete('/api/patients/:patientId/assigned-lessons/:lessonId', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const lessonId = req.params.lessonId;
+
+    const updatedPatient = await Patient.findByIdAndUpdate(
+      patientId,
+      { $pull: { assignedLessons: { lessonId: lessonId } } }, // Remove the lesson from the array
+      { new: true }
+    );
+
+    if (!updatedPatient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.json(updatedPatient);
+  } catch (error) {
+    console.error('Error deleting assigned lesson:', error);
+    res.status(500).json({ error: 'Failed to delete assigned lesson' });
+  }
+});
+
+app.get('/api/patients', async (req, res) => { 
+  try {
+    const patients = await Patient.find(); // Fetch all patients from the database
+    res.json(patients);
+  } catch (error) {
+    console.error('Error fetching patients:', error);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+});
+
+app.get('/api/patients/:patientId', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const patient = await Patient.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.json(patient);
+  } catch (error) {
+    console.error('Error fetching patient:', error);
+    res.status(500).json({ error: 'Failed to fetch patient' });
+  }
+});
+
+app.post('/api/patients/:patientId/assign-lesson', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const { 
+      lessonId, 
+      lesson_name,  
+      lesson_complexity, 
+      lesson_category, 
+      lesson_desc 
+    } = req.body;
+
+
+    // Find the patient and update their assigned lessons (assuming you have an "assignedLessons" array field)
+    const updatedPatient = await Patient.findByIdAndUpdate(
+      patientId,
+      {
+        $addToSet: {
+          assignedLessons: {
+            lessonId: lessonId,
+            lesson_name: lesson_name, // Use underscore case
+            lesson_complexity: lesson_complexity,
+            lesson_category: lesson_category,
+            lesson_desc: lesson_desc,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedPatient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.json(updatedPatient);
+  } catch (error) {
+    console.error('Error assigning lesson:', error);
+    res.status(500).json({ error: 'Failed to assign lesson' });
+  }
+});
+
+app.post('/api/patients/:patientId/progress', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const progressData = req.body;
+
+    // Create a new progress report
+    const newProgress = new Progress({
+      patient_id: patientId,
+      therapy_type: progressData.therapy_type,
+      self_aware: progressData.self_aware,
+      lesson_engagement: progressData.lesson_engagement,
+      improvement_state: progressData.improvement_state,
+      error_frequency: progressData.error_frequency,
+      progress_quality: progressData.progress_quality,
+      remarks: progressData.remarks,
+      progress_score: progressData.progress_score, // Make sure to calculate this score
+    });
+
+    const savedProgress = await newProgress.save();
+
+    res.status(201).json(savedProgress);
+  } catch (error) {
+    console.error('Error updating patient progress:', error);
+    res.status(500).json({ error: 'Failed to update patient progress' });
   }
 });
 // ... other routes and middleware

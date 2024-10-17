@@ -11,10 +11,6 @@ const appointmentSchema = new mongoose.Schema({
     ref: 'Patient', 
     required: true 
   },
-  patient_name: { 
-    type: String, 
-    required: true 
-  },
   appointment_type: { 
     type: String, 
     required: true,

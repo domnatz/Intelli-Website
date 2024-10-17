@@ -106,12 +106,38 @@ const patientSchema = new Schema({
   },
   therapy_types: [{ 
     type: String,
-    enum: ['slp', 'ot', 'pt', 'sped'] 
+    enum: ['slp', 'ot'] 
   }], 
   active: { 
     type: Boolean, 
     default: true,
   },
+
+  assignedLessons: [
+    {
+      lessonId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Lesson'
+      },
+      lesson_name: { 
+        type: String,
+      },
+      lesson_complexity: { 
+        type: String,
+      },
+      lesson_category: { 
+        type: String,
+      },
+      lesson_desc: { 
+        type: String,
+      },
+      assignedDate: {
+        type: Date,
+        default: Date.now
+      },
+      // ... other fields
+    }
+  ],
 
   created_at: { 
     type: Date, 

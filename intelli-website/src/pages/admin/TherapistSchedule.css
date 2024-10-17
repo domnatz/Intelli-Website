@@ -30,24 +30,66 @@
     margin-top: 70px;
 }
 
-.therapist-schedule-table {
-    width: 100%;
-    border-collapse: collapse;
+.therapist-calendar {
+  width: 400px; 
+  height: 350px; 
+  border: 2px solid #ccc; 
+  border-radius: 5px;
+  font-size: 16px;
 }
 
-.therapist-schedule-table th, .therapist-schedule-table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    border-color: #3F4662;
+.schedule-calendar .rbc-calendar {
+    border-radius: 8px;  
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-height: 100%;
 }
 
-.therapist-schedule-table th {
-    background-color: #ffff;
-    font-weight: bold;
-    border-color: #3F4662;
-    color: #3F4662;
-}
+.schedule-calendar .rbc-btn-group button {
+    background-color: #f0f0f0;
+    border: none;
+    color: #333;
+    border-radius: 4px;
+  }
+
+.schedule-calendar .rbc-btn-group button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
+  }
+
+  .therapist-schedule-calendar .rbc-month-view .rbc-header {
+    text-transform: uppercase;
+    font-size: 0.8rem;
+  }
+  
+  /* Style the calendar events  */
+  .therapist-schedule-calendar .rbc-event {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  
+  /* Style selected events */
+  .therapist-schedule-calendar .rbc-event.rbc-selected {
+    background-color: #0056b3; 
+  }
+
+  .rbc-btn-group > button {
+    font-size: 0.8rem;
+  }
+  
+  .rbc-toolbar button { 
+    font-size: 0.8rem;
+    width: 75px;
+  }
+  
+  .rbc-toolbar {
+    display: flex;
+    justify-content: center; /* Center items horizontally */
+    align-items: center;
+  }
 
 /* Input for appointment notes */
 .appointment-notes-input {
@@ -64,10 +106,5 @@
         margin-left: 0;
         padding: 10px;
         width: 100%;
-    }
-
-    .therapist-schedule-table th, .therapist-schedule-table td {
-        font-size: 14px;
-        padding: 10px;
     }
 }

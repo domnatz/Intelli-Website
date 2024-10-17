@@ -30,6 +30,27 @@ body {
     margin-top: 100px;
 }
 
+.staff-home-links {
+    display: flex;
+    justify-content: flex-end;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 10px 20px; 
+    border-radius: 5px;
+    gap: 10px; /* Adjust spacing between links */
+  }
+  
+  .staff-home-link {
+    text-decoration: none;
+    color: white;
+    margin-left: 0; /* Remove default margin */ 
+  }
+  
+  .staff-home-link:hover {
+    text-decoration: none;
+  }
 /* Responsive design */
 @media (max-width: 768px) {
     .Staff-home {
@@ -45,4 +66,5 @@ body {
     .content {
         margin-top: 20px; /* Add margin-top to space content from the sidebar */
     }
+
 }

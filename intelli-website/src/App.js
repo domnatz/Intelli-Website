@@ -1,113 +1,124 @@
-// App.js
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import LandingPage from "./pages/Landing";
+import LoginPage from "./pages/LoginForm";
+import SignUpPage from "./pages/SignupForm";
+import StaffHomePage from "./pages/admin/staffHome";
+import SchedManagerPage from "./pages/admin/ScheduleManager";
+import LessonDetailsPage from './pages/admin/LessonDetails';
+import TherapistSchedulePage from "./pages/admin/TherapistSchedule";
+import UpcomingAppStaffPage from "./pages/admin/UpcomingAppStaff";
+import Sidebar from "./pages/admin/Sidebar";
+import AppointmentPage from "./pages/guardian/Appointments";
+import StaffRegistrationPage from "./pages/SignupStaff";
+import ProgressReport from "./pages/admin/ProgressReport";
+import PatientProfilesPage from "./pages/admin/Profiles";
 
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LandingPage from './pages/Landing';
-import LoginPage from './pages/LoginForm';
-import SignUpPage from './pages/SignupForm';
-
-import StaffHomePage from './pages/admin/staffHome';
-import SchedManagerPage from './pages/admin/ScheduleManager';
-import TherapistSchedulePage from './pages/admin/TherapistSchedule';
-import UpcomingAppStaffPage from './pages/admin/UpcomingAppStaff';
-
-import AppointmentPage from './pages/guardian/Appointments';
+import { useNavigate } from "react-router-dom";
 
 export default function App() {
-  const [userRole, setUserRole] = useState(localStorage.getItem('userRole'));
-  const [authToken, setAuthToken] = useState(localStorage.getItem('authToken'));
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Initialize to false initially
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [userRole, setUserRole] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authToken, setAuthToken] = useState(null);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    // Check localStorage on initial render and update state if needed
-    const storedUserRole = localStorage.getItem('userRole');
-    const storedAuthToken = localStorage.getItem('authToken');
-    if (storedUserRole) {
+    const storedUserRole = localStorage.getItem("userRole");
+    const storedAuthToken = localStorage.getItem("authToken");
+
+    if (storedUserRole && storedAuthToken) {
       setUserRole(storedUserRole);
-    }
-    if (storedAuthToken) {
       setAuthToken(storedAuthToken);
+      setIsAuthenticated(true);
+    } else {
+      setUserRole(null); // Ensure role is reset if not found
+      setIsAuthenticated(false);
     }
 
-    // Now initialize isLoggedIn after isGuardianAndLoggedIn is defined
-    setIsLoggedIn(isGuardianAndLoggedIn()); 
+    setIsLoading(false); // Set loading to false after checking localStorage
   }, []);
 
-  const isStaff = () => userRole === 'staff';
-  const isGuardianAndLoggedIn = () => userRole === 'guardian' && !!authToken;
-
- // const navigate = useNavigate();
-
-  const handleSuccessfulLogin = () => {
-    // Force a re-render to update isLoggedIn in LandingPage
-    setUserRole(localStorage.getItem('userRole'));
-    setAuthToken(localStorage.getItem('authToken'));
-    setIsLoggedIn(isGuardianAndLoggedIn());
-    setRefreshKey(prevKey => prevKey + 1);
-  };
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userRole');
-    setAuthToken(null);
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userRole");
+
     setUserRole(null);
-    setIsLoggedIn(false);
-  //  navigate('/');
+    setIsAuthenticated(false);
+    navigate("/login");
   };
 
-    return (
-      <div>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes (accessible to all users) */}
-            <Route
-              index
-              element={
-                <LandingPage
-                key={refreshKey}
-                  isLoggedIn={isLoggedIn}
-                  onLogout={handleLogout}
-                />
-              }
-            />
-            <Route path="/register" element={<SignUpPage />} />
-            <Route
-              path="/login"
-              element={
-                <LoginPage
-                  setUserRole={setUserRole}
-                  setAuthToken={setAuthToken}
-                  onSuccessfulLogin={handleSuccessfulLogin}
-                />
-              }
-            />
-  
-            {/* Protected Routes for Staff */}
-            <Route
-              path="/home"
-              element={isStaff() ? <StaffHomePage /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/scheduleManager"
-              element={isStaff() ? <SchedManagerPage /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/therapistSchedule"
-              element={isStaff() ? <TherapistSchedulePage /> : <Navigate to="/login" replace />}
-            />
-            <Route
-              path="/upcomingAppStaff"
-              element={isStaff() ? <UpcomingAppStaffPage /> : <Navigate to="/login" replace />}
-            />
-  
-            {/* Protected Route for Guardians */}
-            <Route
-              path="/appointment"
-              element={isGuardianAndLoggedIn() ? <AppointmentPage isLoggedIn={isLoggedIn} onLogout={handleLogout} /> : <Navigate to="/login" replace />}
-            />
-          </Routes>
-        </BrowserRouter>
-      </div>
-    );
+  const isAdmin = () => userRole === "admin";
+  const isStaff = () => userRole === "staff";
+  const isGuardianAndLoggedIn = () =>
+    userRole === "guardian" && isAuthenticated;
+
+  // Conditionally render based on loading state
+  if (isLoading) {
+    return <div>Loading...</div>; // Show loading spinner or message
   }
+
+  return (
+    <div>
+      <Routes>
+        {/* Public Routes (accessible to all users) */}
+        <Route index element={<LandingPage />} />
+        <Route path="/register" element={<SignUpPage />} />
+        <Route
+          path="/login"
+          element={
+            <LoginPage
+              setUserRole={setUserRole}
+              setAuthToken={setAuthToken}
+              setIsAuthenticated={setIsAuthenticated}
+            />
+          }
+        />
+
+        {/* Protected Routes for Staff and Admin - Wrap in a layout component */}
+        <Route
+          element={isAuthenticated && (isStaff() || isAdmin()) ? <Outlet /> : <Navigate to="/login" replace />}
+        >
+         <Route
+    path="/home"
+    element={
+        <div>
+            <Sidebar
+                userRole={userRole}
+                onLogout={handleLogout}
+                isAuthenticated={isAuthenticated}
+            />
+            <StaffHomePage 
+                userRole={userRole} 
+                onLogout={handleLogout} 
+            />
+        </div>
+    }
+/>
+          <Route path="/scheduleManager" element={<SchedManagerPage />} />
+          <Route path="/LessonDetails" element={<LessonDetailsPage />} />
+          <Route path="/ProgressReport/:patientId" element={<ProgressReport />} />
+          <Route path="/therapistSchedule" element={<TherapistSchedulePage />} />
+          <Route path="/upcomingAppStaff" element={<UpcomingAppStaffPage />} />
+          <Route path="/Profiles" element={<PatientProfilesPage />} />
+        </Route>
+
+        {/* Protected Route for Staff Registration (accessible only to admins) */}
+        <Route path="/SignupStaff" element={<StaffRegistrationPage />} />
+
+        {/* Protected Route for Guardians */}
+        <Route
+          path="/appointment"
+          element={
+            isGuardianAndLoggedIn() ? (
+              <AppointmentPage />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
+      </Routes>
+    </div>
+  );
+}

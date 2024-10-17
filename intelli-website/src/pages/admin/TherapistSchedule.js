@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import './TherapistSchedule.css';
-import { Button } from '@mui/material';
+//import { Button } from '@mui/material';
 import Sidebar from './Sidebar';
+/* 
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';  */
+import moment from 'moment';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+
+const localizer = momentLocalizer(moment)
 
 export default function TherapistSchedule() {
   const [scheduleData, setScheduleData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [markedDates, setMarkedDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,6 +34,13 @@ export default function TherapistSchedule() {
         console.log('Data:', data);
         setScheduleData(data);
         setError(null); // Clear any previous errors
+
+        // Extract dates from the fetched data and format them
+        const dates = data.map((schedule) => 
+          new Date(schedule.start_time).toLocaleDateString()
+        );
+        setMarkedDates(dates);
+
       } catch (err) {
         console.error('Error fetching data:', err);
         setError(err.message); 
@@ -34,6 +51,13 @@ export default function TherapistSchedule() {
 
     fetchData();
   }, []); // Empty dependency array ensures this runs once on mount
+
+  const bookedDate = scheduleData.map((schedule) => ({
+    title: schedule.therapist_id?.therapist_name || 'Unknown', // Display therapist name
+    start: moment(schedule.start_time).toDate(),
+    end: moment(schedule.end_time).toDate(),
+    scheduleId: schedule._id,
+  }));
 
   const handleDeleteSchedule = async (scheduleId) => {
     if (window.confirm("Are you sure you want to delete this schedule?")) {
@@ -67,7 +91,6 @@ export default function TherapistSchedule() {
     }
 };
 
-
 return (
   <div className="therapist-schedule-layout">
     <Sidebar />
@@ -79,41 +102,17 @@ return (
         {isLoading && <div className="loading-indicator">Loading...</div>}
 
         {!isLoading && !error && (
-          <table className="therapist-schedule-table">
-            <thead>
-              <tr>
-                <th>Therapist Name</th>
-                <th>Date</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {scheduleData.map((schedule) => (
-                <tr key={schedule._id}>
-                  <td>{schedule.therapist_id?.therapist_name || 'Unknown'}</td>
-                  <td>{new Date(schedule.start_time).toLocaleDateString()}</td>
-                  <td>{new Date(schedule.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                  <td>{new Date(schedule.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
-                  <td>
-                  <Button
-  variant="contained"
-  onClick={() => handleDeleteSchedule(schedule._id)}
-  sx={{
-    backgroundColor: "red", // Directly set the background color to red
-    color: "white", // Set text color to white for contrast
-    "&:hover": {
-      backgroundColor: "darkred", // Darker red on hover
-    },
-  }}
->
-  Delete
-</Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="therapist-schedule-calendar">
+            <Calendar localizer={localizer}
+              events={bookedDate}
+              startAccessor="start"
+              endAccessor="end"
+              defaultView="month"
+              style={{ height: 800 }}
+              onSelectEvent={handleDeleteSchedule}
+              className="schedule-calendar"
+            />
+          </div>
         )}
       </div>
     </div>

@@ -1,90 +1,90 @@
-import './Login.css';
-import logo from '../images/logo.png';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import "./Login.css";
+import logo from "../images/logo.png";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function LoginForm({ setUserRole, setAuthToken, onSuccessfulLogin }) {
+export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticated }) {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
+  const   
+ navigate = useNavigate();
 
   const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(null);
+    setError(null);   
+
     setIsLoading(true);
 
     try {
-      console.log('API URL:', `${process.env.REACT_BACKEND_API}/api/login`);
       const response = await fetch(`${process.env.REACT_BACKEND_API}/api/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData),   
+
       });
 
       setIsLoading(false);
 
-      if (!response.ok) {
-        try {
-          const errorData = await response.json();
-          setError(errorData.error || 'An error occurred during login. Please try again later.');
-        } catch (parseError) {
-          setError('Unexpected response from the server. Please try again later.');
-          console.error('Error parsing server response:', parseError);
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("authToken", data.token);
+        localStorage.setItem("userRole", data.user.role);
+
+        // Update state variables
+        setAuthToken(data.token);
+        setUserRole(data.user.role); // Set userRole directly from login response
+        setIsAuthenticated(true);
+
+        // Clear form data after successful login
+        setFormData({ username: "", password: "" });
+
+        if (data.user.role === "guardian") {
+          navigate("/appointment", { replace: true });
+        } else if (data.user.role === "staff" || data.user.role === "admin") {
+          navigate("/home", { replace: true });
         }
       } else {
-        const userData = await response.json();
-        console.log('Raw response data:', userData);
-
-        if (!userData || !userData.user || !userData.user.role) {
-          setError('Invalid response from server. Missing user role information.');
-          return;
-        }
-
-        console.log('Login successful!', userData);
-
-        localStorage.setItem('authToken', userData.token);
-        localStorage.setItem('userRole', userData.user.role);
-        setAuthToken(userData.token);
-        setUserRole(userData.user.role);
-
-        if (userData.user.role === 'guardian') {
-          navigate('/appointment', { replace: true });
-        } else if (userData.user.role === 'staff') {
-          navigate('/home', { replace: true });
+        // More specific error handling
+        if (response.status === 401) {
+          setError("Invalid username or password");
         } else {
-          console.error('Unknown user role:', userData.user.role);
-          setError('Invalid user role. Please contact support.');
+          const errorData = await response.json();
+          setError(errorData.error || "Failed to log in");
         }
       }
     } catch (error) {
       setIsLoading(false);
-      setError('Network error. Please try again later.');
-      console.error('Network error:', error);
+      setError("Network error. Please try again later.");
+      console.error("Network error:", error);
     }
-    onSuccessfulLogin(); 
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
         <h2>Login</h2>
-        <img src={logo} alt="Logo" className="logoa" />
+        <img src={logo} alt="Logo" className="intelliLogo" />
 
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <label htmlFor="username" className="email">Username:</label>
+          <label htmlFor="username" className="email">
+            Username:
+          </label>
           <input
             type="text"
             id="username"
@@ -96,7 +96,9 @@ export default function LoginForm({ setUserRole, setAuthToken, onSuccessfulLogin
           />
           <br />
 
-          <label htmlFor="password" className="password">Password:</label>
+          <label htmlFor="password" className="password">
+            Password:
+          </label>
           <input
             type="password"
             id="password"
@@ -109,9 +111,11 @@ export default function LoginForm({ setUserRole, setAuthToken, onSuccessfulLogin
           <br />
 
           <button className="login-btn" type="submit" disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'LOGIN'}
+            {isLoading ? "Logging in..." : "LOGIN"}
           </button>
-          <p>Don't have an account? <Link to="/register">Sign up here</Link></p>
+          <p>
+            Don't have an account? <Link to="/register">Sign up here</Link>
+          </p>
         </form>
       </div>
     </div>
