@@ -45,8 +45,8 @@ const authenticateUser = async (req, res, next) => {
       console.log("Extracted token:", token); 
 
       const decodedToken = jwt.verify(
-          token,
-          "zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE" // Replace with your actual secret key or use an environment variable
+        token,
+        process.env.JWT_SECRET_KEY 
       );
       console.log("Decoded token:", decodedToken); 
 
