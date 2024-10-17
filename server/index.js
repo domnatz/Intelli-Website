@@ -527,7 +527,6 @@ app.post('/api/patients', async (req, res) => {
   }
 });
 
-
 app.post('/api/lessons', async (req, res) => {
   try {
     console.log('Received lesson data:', req.body);  // Log the received data
@@ -617,7 +616,7 @@ app.delete('/api/patients/:patientId/assigned-lessons/:lessonId', async (req, re
 
     const updatedPatient = await Patient.findByIdAndUpdate(
       patientId,
-      { $pull: { assignedLessons: { lessonId: lessonId } } }, // Remove the lesson from the array
+      { $pull: { assignedLessons: { lessonId: lessonId } } }, 
       { new: true }
     );
 
