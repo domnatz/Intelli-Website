@@ -232,7 +232,7 @@ export default function PatientInfoForm() {
   useEffect(() => {
     const fetchPatient = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/patients/${patientId}`);
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}`);
         if (response.ok) {
           const data = await response.json();
           return data;
@@ -248,7 +248,7 @@ export default function PatientInfoForm() {
 
     const fetchLessons = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/lessons`);
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/lessons`);
         if (response.ok) {
           const data = await response.json();
           setLessons(data);
@@ -293,7 +293,7 @@ export default function PatientInfoForm() {
   }
   const handleDeleteLesson = async (lessonId) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/patients/${patientId}/assigned-lessons/${lessonId}`, {
+      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}/assigned-lessons/${lessonId}`, {
         method: 'DELETE',
       });
 
@@ -326,7 +326,7 @@ export default function PatientInfoForm() {
         formData.append("report_file", selectedFile);
       }
 
-      const response = await fetch(`/api/patients/${patientId}/progress`, {
+      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}/progress`, {
         method: "POST",
         body: formData,
       });
@@ -347,7 +347,7 @@ export default function PatientInfoForm() {
   const handleAssignLesson = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3001/api/patients/${patientId}/assign-lesson`,
+        `${process.env.REACT_BACKEND_API}/api/patients/${patientId}/assign-lesson`,
         {
           method: "POST",
           headers: {
