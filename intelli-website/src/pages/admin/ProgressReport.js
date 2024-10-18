@@ -16,8 +16,10 @@ import {
   Select,
   Alert,
   InputLabel,
+  CircularProgress,
 } from "@mui/material";
 import Sidebar from "./Sidebar";
+
 
 async function recommendLessons(patient, lessons) {
   const recommendedLessons = [];
@@ -78,7 +80,14 @@ async function recommendLessons(patient, lessons) {
       }
       return false;
     });
-  } else if (schoolSkillsTally >= 1) {
+  } else if (schoolSkillsTally >= 1.5) {
+    schoolSkillsLesson = schoolSkillsLessons.filter((lesson) => {
+      if (lesson && lesson.lesson_complexity) {
+        return lesson.lesson_complexity.trim().toLowerCase() === "medium";
+      }
+      return false;
+    });
+  } else if (schoolSkillsTally >= 0.7) {
     schoolSkillsLesson = schoolSkillsLessons.filter((lesson) => {
       if (lesson && lesson.lesson_complexity) {
         return lesson.lesson_complexity.trim().toLowerCase() === "easy";
@@ -116,7 +125,14 @@ async function recommendLessons(patient, lessons) {
       }
       return false;
     });
-  } else if (physicalTasksTally >= 1) {
+  } else if (physicalTasksTally >= 1.5) {
+    physicalTasksLesson = physicalTasksLessons.filter((lesson) => {
+      if (lesson && lesson.lesson_complexity) {
+        return lesson.lesson_complexity.trim().toLowerCase() === "medium";
+      }
+      return false;
+    });
+  } else if (physicalTasksTally >= 0.7) {
     physicalTasksLesson = physicalTasksLessons.filter((lesson) => {
       if (lesson && lesson.lesson_complexity) {
         return lesson.lesson_complexity.trim().toLowerCase() === "easy";
@@ -156,7 +172,14 @@ async function recommendLessons(patient, lessons) {
       }
       return false;
     });
-  } else if (receptiveSkillsTally >= 1) {
+  } else if (receptiveSkillsTally >= 1.5) {
+    receptiveSkillsLesson = receptiveSkillsLessons.filter((lesson) => {
+      if (lesson && lesson.lesson_complexity) {
+        return lesson.lesson_complexity.trim().toLowerCase() === "medium";
+      }
+      return false;
+    });
+  } else if (receptiveSkillsTally >= 0.7) {
     receptiveSkillsLesson = receptiveSkillsLessons.filter((lesson) => {
       if (lesson && lesson.lesson_complexity) {
         return lesson.lesson_complexity.trim().toLowerCase() === "easy";
@@ -193,7 +216,14 @@ async function recommendLessons(patient, lessons) {
       }
       return false;
     });
-  } else if (motorSkillsTally >= 1) {
+  } else if (motorSkillsTally >= 1.5) {
+    motorSkillsLesson = motorSkillsLessons.filter((lesson) => {
+      if (lesson && lesson.lesson_complexity) {
+        return lesson.lesson_complexity.trim().toLowerCase() === "medium";
+      }
+      return false;
+    });
+  } else if (motorSkillsTally >= 0.7) {
     motorSkillsLesson = motorSkillsLessons.filter((lesson) => {
       if (lesson && lesson.lesson_complexity) {
         return lesson.lesson_complexity.trim().toLowerCase() === "easy";
@@ -212,6 +242,7 @@ async function recommendLessons(patient, lessons) {
 
   return recommendedLessons;
 }
+
 export default function PatientInfoForm() {
   const { patientId } = useParams();
   const [patient, setPatient] = useState(null);
@@ -228,6 +259,7 @@ export default function PatientInfoForm() {
   const [progressScore, setProgressScore] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(true);
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -269,6 +301,9 @@ export default function PatientInfoForm() {
       } else {
         console.error("Failed to fetch patient data.");
       }
+       setTimeout(() => {
+        setLoadingRecommendations(false);
+      }, 2000); 
     }
 
     fetchData ();
@@ -627,10 +662,17 @@ export default function PatientInfoForm() {
     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
       Lesson Recommendations:
     </Typography>
-
-    {/* Display recommended lessons */}
-    {recommendations.map((lesson, index) => (
-      <div key={index}>
+{/* Conditionally render loading indicator or recommendations */}
+{loadingRecommendations ? (
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100px" }}>
+              <CircularProgress />
+              <Typography variant="body1" sx={{ marginLeft: "10px" }}>
+                Generating recommendations...
+              </Typography>
+            </div>
+          ) : (
+            recommendations.map((lesson, index) => (
+              <div key={index}>
         <Typography>
           This patient might need to take the lesson <b>{lesson.lesson_name}</b>.
         </Typography>
@@ -639,7 +681,8 @@ export default function PatientInfoForm() {
         <Typography>Category: {lesson.lesson_category}</Typography>
         <Typography>Description: {lesson.lesson_desc}</Typography> 
       </div>
-    ))}
+      ))
+    )}
   </Box>
 
   <Box

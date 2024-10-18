@@ -77,7 +77,7 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
     <div className="login-container">
       <div className="login-box">
         <h2>Login</h2>
-        <img src={logo} alt="Logo" className="intelliLogo" />
+        <img src={logo} alt="Logo" className="logoa" />
 
         {error && <div className="error-message">{error}</div>}
 
