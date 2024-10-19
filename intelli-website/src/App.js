@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import LoginPage from "./pages/LoginForm";
 import SignUpPage from "./pages/SignupForm";
+import VerificationPage from "./VerificationPage";
 import StaffHomePage from "./pages/admin/staffHome";
 import SchedManagerPage from "./pages/admin/ScheduleManager";
 import LessonDetailsPage from './pages/admin/LessonDetails';
@@ -65,6 +66,7 @@ export default function App() {
         {/* Public Routes (accessible to all users) */}
         <Route index element={<LandingPage />} />
         <Route path="/register" element={<SignUpPage />} />
+        <Route path="/verify/:token" element={<VerificationPage />} /> 
         <Route
           path="/login"
           element={

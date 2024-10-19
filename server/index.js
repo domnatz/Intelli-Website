@@ -108,9 +108,7 @@ app.get('/verify/:token', async (req, res) => {
 
       user.verified = true;
       await user.save();
-
-      res.send('Email verified successfully!'); // Redirect to a success page in your frontend
-      res.redirect('https://intelliwebsite.vercel.app/login'); 
+      res.status(200).json({ message: 'Email verified successfully!', redirectUrl: 'https://intelliwebsite.vercel.app/login' }); 
   } catch (error) {
       console.error('Error during verification:', error);
       res.status(500).json({ message: 'Verification failed.' });
