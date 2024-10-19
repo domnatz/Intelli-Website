@@ -45,7 +45,7 @@ export default function SignupForm() {
 
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_BACKEND_API}/api/users`,
+                `${process.env.REACT_BACKEND_API}/api/users`,
                 {
                     method: "POST",
                     headers: {
