@@ -9,7 +9,7 @@ const VerificationPage = () => {
     useEffect(() => {
         const verifyEmail = async () => {
             try {
-                const response = await fetch(`${process.env.REACT_BACKEND_API}//verify/${token}`);
+                const response = await fetch(`${process.env.REACT_BACKEND_API}/verify/${token}`);
                 const data = await response.json(); 
 
                 if (response.ok) {
