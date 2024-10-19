@@ -1,6 +1,7 @@
 import "./Signup.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
+import { Alert, Snackbar } from "@mui/material";
 
 export default function StaffRegistrationPage() {
     const [formData, setFormData] = useState({
@@ -15,6 +16,9 @@ export default function StaffRegistrationPage() {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+    const [snackbarMessage, setSnackbarMessage] = useState('');
     const navigate = useNavigate(); 
 
     const handleChange = (event) => {
@@ -55,6 +59,9 @@ export default function StaffRegistrationPage() {
                 const savedUser = await response.json();
                 console.log("Staff signup successful!", savedUser);
                 setSuccessMessage("Staff signup successful!");
+                setSnackbarSeverity('success');
+                setSnackbarMessage('Staff signup successful!');
+                setOpenSnackbar(true);
                 setFormData({
                     name: "",
                     contact_number: "",
@@ -63,36 +70,45 @@ export default function StaffRegistrationPage() {
                     password: "",
                     confirmPassword: "",
                 });
-                navigate('/home', { replace: true }); 
+                navigate('/home', { replace: true });
             } else {
                 try {
                     const errorData = await response.json();
                     if (errorData && errorData.error) {
                         setError(errorData.error);
+                        setSnackbarSeverity('error');
+                        setSnackbarMessage(errorData.error);
+                        setOpenSnackbar(true);
                     } else {
-                        setError(
-                            "An error occurred during signup. Please try again later."
-                        );
+                        setError("An error occurred during signup. Please try again later.");
+                        setSnackbarSeverity('error');
+                        setSnackbarMessage('An error occurred during signup. Please try again later.');
+                        setOpenSnackbar(true);
                     }
                 } catch (parseError) {
-                    setError(
-                        "Unexpected error from server. Please try again later."
-                    );
-                    console.error(
-                        "Error parsing server response:",
-                        parseError
-                    );
+                    setError("Unexpected error from server. Please try again later.");
+                    setSnackbarSeverity('error');
+                    setSnackbarMessage('Unexpected error from server. Please try again later.');
+                    setOpenSnackbar(true);
+                    console.error("Error parsing server response:", parseError);
                 }
             }
         } catch (error) {
             setIsLoading(false);
             setError("Network error. Please try again later.");
+            setSnackbarSeverity('error');
+            setSnackbarMessage('Network error. Please try again later.');
+            setOpenSnackbar(true);
             console.error("Network error:", error);
         }
     };
 
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
+    };
+
     return (
-        <div className="signup-container"> 
+        <div className="signup-container">
             <div className="signup-box">
                 <h2>Staff Sign up</h2>
 
@@ -190,6 +206,11 @@ export default function StaffRegistrationPage() {
                     </p>
                 </form>
             </div>
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

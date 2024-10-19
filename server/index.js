@@ -11,7 +11,8 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken'); 
 const multer = require('multer');
-const upload = multer();
+const upload = multer();const nodemailer = require('nodemailer'); 
+const crypto = require('crypto'); 
 const app = express();
 
 const PORT = process.env.PORT || 3001;
@@ -39,34 +40,50 @@ app.get('/', (req, res) => {
   res.send('Backend is working!'); 
 });
 
-// User routes
+const transporter = nodemailer.createTransport({
+  service: 'gmail', 
+  auth: {
+      user: 'projectintellispeechcapstone@gmail.com',
+      pass: 'kzmn ensh ulbp xrun'
+  }
+})
 
 const authenticateUser = async (req, res, next) => {
   try {
-      console.log("Authorization header:", req.headers.authorization); 
+    console.log("Authorization header:", req.headers.authorization);
 
-      // Correctly split the Authorization header to extract the token
-      const token = req.headers.authorization.split(" ")[1]; 
-      console.log("Extracted token:", token); 
+    // Check if the Authorization header exists
+    if (!req.headers.authorization) {
+      return res.status(401).json({ error: "Authorization header missing" });
+    }
 
-      const decodedToken = jwt.verify(
-          token,
-          "zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE" // Replace with your actual secret key or use an environment variable
-      );
-      console.log("Decoded token:", decodedToken); 
+    // Correctly split the Authorization header to extract the token
+    const token = req.headers.authorization.split(" ")[1];
+    console.log("Extracted token:", token);
 
-      const user = await User.findById(decodedToken.userId);
-      console.log("User:", user); 
+    // Check if a token was provided
+    if (!token) {
+      return res.status(401).json({ error: "Token missing" });
+    }
 
-      if (!user) { // Check only if the user exists
-          return res.status(403).json({ error: "Forbidden" });
-      }
+    const decodedToken = jwt.verify(
+      token,
+      "zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE" // Replace with your actual secret key or use an environment variable
+    );
+    console.log("Decoded token:", decodedToken);
 
-      req.user = user;
-      next();
+    const user = await User.findById(decodedToken.userId);
+    console.log("User:", user);
+
+    if (!user) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    req.user = user;
+    next();
   } catch (error) {
-      console.error("Authentication error:", error);
-      res.status(401).json({ error: "Unauthorized" });
+    console.error("Authentication error:", error);
+    res.status(401).json({ error: "Unauthorized" });
   }
 };
 
@@ -79,35 +96,72 @@ const isAdmin = (req, res, next) => {
   }
 };
 
+app.get('/verify/:token', async (req, res) => {
+  const token = req.params.token;
+
+  try {
+      const user = await User.findOne({ verificationToken: token });
+
+      if (!user) {
+          return res.status(404).send('Invalid token.');
+      }
+
+      user.verified = true;
+      await user.save();
+
+      res.send('Email verified successfully!'); // Redirect to a success page in your frontend
+      res.redirect('https://intelliwebsite.vercel.app/login'); 
+  } catch (error) {
+      console.error('Error during verification:', error);
+      res.status(500).json({ message: 'Verification failed.' });
+  }
+});
+
 // User routes (modified for guardian-only signup)
 app.post('/api/users', async (req, res) => {
   try {
-    const { name, username, email_address, password } = req.body; // Include name
+      const { name, username, email_address, password } = req.body;
 
-    // Check if username or email already exists
-    const existingUser = await User.findOne({ $or: [{ username }, { email_address }] });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Username or email already exists' });
-    }
+      // Check if username or email already exists
+      const existingUser = await User.findOne({ $or: [{ username }, { email_address }] });
+      if (existingUser) {
+          return res.status(400).json({ error: 'Username or email already exists' });
+      }
 
-    // Hash the password
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+      // Hash the password
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // Always create a 'guardian' role user
-    const newUser = new User({
-      name, // Include name
-      username,
-      email_address,
-      password: hashedPassword,
-      role: 'guardian', 
-    });
+      // Create a new user with verification token
+      const verificationToken = crypto.randomBytes(20).toString('hex');
+      const newUser = new User({
+          name,
+          username,
+          email_address,
+          password: hashedPassword,
+          role: 'guardian',
+          verificationToken: verificationToken, 
+          verified: false 
+      });
 
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+      const savedUser = await newUser.save();
+
+      // Send verification email
+      const verificationLink = `https://intelliwebsite.vercel.app/verify/${verificationToken}`;
+
+      const mailOptions = {
+          from: 'projectintellispeechcapstone@gmail.com', 
+          to: savedUser.email_address,
+          subject: 'Email Verification',
+          html: `<p>Click this link to verify your email: <a href="${verificationLink}">${verificationLink}</a></p>`
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      res.status(201).json({ message: 'User created, verification email sent.' });
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -142,26 +196,33 @@ app.post('/api/staff', authenticateUser, isAdmin, async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 // Basic login route
 app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
+    console.log("Login attempt with username:", username);
 
     const user = await User.findOne({ username });
     if (!user) {
+      console.log("User not found:", username);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    console.log("User found:", user);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      console.log("Invalid password for user:", username);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    console.log("Password valid for user:", username);
 
-    // Generate a JWT (after successful authentication)
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET_KEY || 'zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE'); 
+  //  if (!user.verified) {
+  //    console.log("Email not verified for user:", username);
+   // }
 
-    // Include the JWT in the response
+    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET_KEY || 'zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE');
+    console.log("JWT generated for user:", username);
+
     res.json({ 
       message: 'Login successful!', 
       token: token,  

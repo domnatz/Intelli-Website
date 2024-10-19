@@ -2,6 +2,7 @@ import "./Signup.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { Alert, Snackbar } from "@mui/material";
 
 export default function SignupForm() {
     const [formData, setFormData] = useState({
@@ -18,6 +19,9 @@ export default function SignupForm() {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -57,12 +61,17 @@ export default function SignupForm() {
 
             setIsLoading(false);
 
-            if (response.ok) {
-                const savedUser = await response.json();
-                console.log("Signup successful!", savedUser);
-                setSuccessMessage(
-                    "Signup successful! You can now log in."
-                );
+            if (response.status === 201) {
+                // Signup successful, show success message and redirect
+              //  setSuccessMessage(
+               //     "Signup successful! Please check your email to verify your account."
+              //  );
+
+                // Redirect to login page after a short delay
+                setTimeout(() => {
+                    navigate('/login');
+                }, 3000);
+
                 setFormData({
                     name: "",
                     contact_number: "",
@@ -72,6 +81,12 @@ export default function SignupForm() {
                     password: "",
                     confirmPassword: "",
                 });
+
+                // Set Snackbar state for success
+                setSnackbarSeverity('success');
+                setSnackbarMessage('Signup successful! Please check your email.');
+                setOpenSnackbar(true);
+
             } else {
                 try {
                     const errorData = await response.json();
@@ -82,6 +97,12 @@ export default function SignupForm() {
                             "An error occurred during signup. Please try again later."
                         );
                     }
+
+                    // Set Snackbar state for error (inside the catch block)
+                    setSnackbarSeverity('error');
+                    setSnackbarMessage(error || 'Signup failed.');
+                    setOpenSnackbar(true);
+
                 } catch (parseError) {
                     setError(
                         "Unexpected error from server. Please try again later."
@@ -90,13 +111,27 @@ export default function SignupForm() {
                         "Error parsing server response:",
                         parseError
                     );
+
+                    // Set Snackbar state for parsing error
+                    setSnackbarSeverity('error');
+                    setSnackbarMessage('Unexpected error from server.');
+                    setOpenSnackbar(true);
                 }
             }
         } catch (error) {
             setIsLoading(false);
             setError("Network error. Please try again later.");
             console.error("Network error:", error);
+
+            // Set Snackbar state for network error
+            setSnackbarSeverity('error');
+            setSnackbarMessage('Network error. Please try again later.');
+            setOpenSnackbar(true);
         }
+    };
+
+    const handleCloseSnackbar = () => {
+        setOpenSnackbar(false);
     };
 
     return (
@@ -212,6 +247,11 @@ export default function SignupForm() {
                     </p>
                 </form>
             </div>
+            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+                <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

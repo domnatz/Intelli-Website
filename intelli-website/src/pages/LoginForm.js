@@ -2,6 +2,7 @@ import "./Login.css";
 import logo from "../images/logo.png";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Alert, Snackbar } from "@mui/material"; 
 
 export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticated }) {
   const [formData, setFormData] = useState({
@@ -10,9 +11,10 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const   
- navigate = useNavigate();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (event) => {
     setFormData({
@@ -44,33 +46,51 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
         localStorage.setItem("authToken", data.token);
         localStorage.setItem("userRole", data.user.role);
 
-        // Update state variables
         setAuthToken(data.token);
-        setUserRole(data.user.role); // Set userRole directly from login response
+        setUserRole(data.user.role);
         setIsAuthenticated(true);
 
-        // Clear form data after successful login
         setFormData({ username: "", password: "" });
 
         if (data.user.role === "guardian") {
-          navigate("/appointment", { replace: true });
+            navigate("/appointment", { replace: true });
         } else if (data.user.role === "staff" || data.user.role === "admin") {
-          navigate("/home", { replace: true });
+            navigate("/home", { replace: true });
         }
-      } else {
+
+        // Set Snackbar state for success
+        setSnackbarSeverity('success');
+        setSnackbarMessage('Login successful!');
+        setOpenSnackbar(true); 
+
+    } else {
         // More specific error handling
         if (response.status === 401) {
-          setError("Invalid username or password");
+         //   setError("Invalid username or password");
         } else {
-          const errorData = await response.json();
-          setError(errorData.error || "Failed to log in");
+            const errorData = await response.json();
+           // setError(errorData.error || "Failed to log in");
         }
-      }
-    } catch (error) {
-      setIsLoading(false);
-      setError("Network error. Please try again later.");
-      console.error("Network error:", error);
+
+        // Set Snackbar state for error
+        setSnackbarSeverity('error');
+        setSnackbarMessage(error || 'Invalid username or password'); 
+        setOpenSnackbar(true); 
     }
+} catch (error) {
+    setIsLoading(false);
+    setError("Network error. Please try again later.");
+    console.error("Network error:", error);
+
+    // Set Snackbar state for network error
+    setSnackbarSeverity('error');
+    setSnackbarMessage('Network error. Please try again later.');
+    setOpenSnackbar(true); 
+}
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -113,11 +133,16 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
           <button className="login-btn" type="submit" disabled={isLoading}>
             {isLoading ? "Logging in..." : "LOGIN"}
           </button>
-          <p>
+            <p className="register-link">
             Don't have an account? <Link to="/register">Sign up here</Link>
           </p>
         </form>
       </div>
+      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
