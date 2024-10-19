@@ -9,6 +9,8 @@ const Lesson = require('./models/lesson');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken'); 
+const multer = require('multer');
+const upload = multer();
 const app = express();
 
 const PORT = process.env.PORT || 3001;
@@ -37,16 +39,18 @@ app.get('/', (req, res) => {
 });
 
 // User routes
+
 const authenticateUser = async (req, res, next) => {
   try {
       console.log("Authorization header:", req.headers.authorization); 
 
-      const token = req.headers.authorization.split("")[1]; 
+      // Correctly split the Authorization header to extract the token
+      const token = req.headers.authorization.split(" ")[1]; 
       console.log("Extracted token:", token); 
 
       const decodedToken = jwt.verify(
-        token,
-        process.env.JWT_SECRET_KEY 
+          token,
+          "zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE" // Replace with your actual secret key or use an environment variable
       );
       console.log("Decoded token:", decodedToken); 
 
@@ -77,7 +81,7 @@ const isAdmin = (req, res, next) => {
 // User routes (modified for guardian-only signup)
 app.post('/api/users', async (req, res) => {
   try {
-    const { username, email_address, password } = req.body; 
+    const { name, username, email_address, password } = req.body; // Include name
 
     // Check if username or email already exists
     const existingUser = await User.findOne({ $or: [{ username }, { email_address }] });
@@ -91,6 +95,7 @@ app.post('/api/users', async (req, res) => {
 
     // Always create a 'guardian' role user
     const newUser = new User({
+      name, // Include name
       username,
       email_address,
       password: hashedPassword,
@@ -697,32 +702,59 @@ app.post('/api/patients/:patientId/assign-lesson', async (req, res) => {
   }
 });
 
-app.post('/api/patients/:patientId/progress', async (req, res) => {
+app.post('/api/patients/:patientId/progress', upload.single('report_file'), async (req, res) => {
   try {
-    const patientId = req.params.patientId;
-    const progressData = req.body;
+      const patientId = req.params.patientId;
+      const progressData = req.body;
 
-    // Create a new progress report
-    const newProgress = new Progress({
-      patient_id: patientId,
-      therapy_type: progressData.therapy_type,
-      self_aware: progressData.self_aware,
-      lesson_engagement: progressData.lesson_engagement,
-      improvement_state: progressData.improvement_state,
-      error_frequency: progressData.error_frequency,
-      progress_quality: progressData.progress_quality,
-      remarks: progressData.remarks,
-      progress_score: progressData.progress_score, // Make sure to calculate this score
-    });
+      // Log the received data for debugging
+      console.log('Received progress data:', progressData);
 
-    const savedProgress = await newProgress.save();
+      let reportFile = null;
+      if (req.file) {
+          reportFile = {
+              filename: req.file.originalname,
+              contentType: req.file.mimetype,
+              data: req.file.buffer,
+          };
+      }
 
-    res.status(201).json(savedProgress);
+      // Create a new Progress object
+      const newProgress = new Progress({
+          patient_id: patientId,
+          self_aware: progressData.self_aware === 'true', // Ensure boolean conversion
+          lesson_engagement: progressData.lesson_engagement,
+          improvement_state: progressData.improvement_state,
+          error_frequency: progressData.error_frequency,
+          progress_quality: progressData.progress_quality,
+          remarks: progressData.remarks,
+          progress_score: parseInt(progressData.progress_score, 10), // Convert to number
+          report_file: reportFile,
+      });
+
+      const savedProgress = await newProgress.save();
+      res.status(201).json(savedProgress);
   } catch (error) {
-    console.error('Error updating patient progress:', error);
-    res.status(500).json({ error: 'Failed to update patient progress' });
+      console.error('Error updating patient progress:', error);
+      res.status(500).json({ error: 'Failed to update patient progress' });
   }
 });
+
+
+app.get('/api/patients/:patientId/progress', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+
+    // Fetch the progress reports for the given patient
+    const progressReports = await Progress.find({ patient_id: patientId });
+
+    res.json(progressReports);
+  } catch (error) {
+    console.error('Error fetching progress reports:', error);
+    res.status(500).json({ error: 'Failed to fetch progress reports' });
+  }
+});
+
 // ... other routes and middleware
 
 /*app.get('/api/therapists-avail', async (req, res) => {
