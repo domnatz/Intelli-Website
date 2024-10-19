@@ -97,20 +97,26 @@ const isAdmin = (req, res, next) => {
 };
 
 app.get('/verify/:token', async (req, res) => {
-  const token = req.params.token;
+  console.log('Verification request received with token:', req.params.token); // Log the received token
 
   try {
-      const user = await User.findOne({ verificationToken: token });
+      const user = await User.findOne({ verificationToken: req.params.token });
 
       if (!user) {
+          console.log('User not found for token:', req.params.token); // Log if user not found
           return res.status(404).send('Invalid token.');
       }
 
+      console.log('User found:', user); // Log the found user
+
       user.verified = true;
       await user.save();
+
+      console.log('User verified:', user); // Log the updated user
+
       res.status(200).json({ message: 'Email verified successfully!', redirectUrl: 'https://intelliwebsite.vercel.app/login' }); 
   } catch (error) {
-      console.error('Error during verification:', error);
+      console.error('Error during verification:', error); // Log the error
       res.status(500).json({ message: 'Verification failed.' });
   }
 });

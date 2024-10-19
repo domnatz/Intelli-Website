@@ -9,16 +9,22 @@ const VerificationPage = () => {
     useEffect(() => {
         const verifyEmail = async () => {
             try {
+                console.log('Verification token:', token); // Log the token
                 const response = await fetch(`${process.env.REACT_BACKEND_API}/verify/${token}`);
-                const data = await response.json(); 
-
+                console.log('Verification response:', response); // Log the response object
+    
                 if (response.ok) {
+                    const data = await response.json();
+                    console.log('Verification data:', data); // Log the response data
+                    console.log('Redirect URL:', data.redirectUrl); // Log the redirect URL
+    
                     setVerificationStatus('success');
-
+    
                     setTimeout(() => {
                         navigate(data.redirectUrl);  
-                    }, 3000);
+                    }, 5000);
                 } else {
+                    console.error('Verification failed:', response.status, response.statusText); // Log the error
                     setVerificationStatus('failed');
                 }
             } catch (error) {
@@ -26,9 +32,9 @@ const VerificationPage = () => {
                 setVerificationStatus('failed');
             }
         };
-
+    
         verifyEmail();
-    }, [token, navigate]); 
+    }, [token, navigate]);
 
     return (
         <div>
