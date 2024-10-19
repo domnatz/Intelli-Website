@@ -20,7 +20,6 @@ import {
 } from "@mui/material";
 import Sidebar from "./Sidebar";
 
-
 async function recommendLessons(patient, lessons) {
   const recommendedLessons = [];
 
@@ -242,7 +241,6 @@ async function recommendLessons(patient, lessons) {
 
   return recommendedLessons;
 }
-
 export default function PatientInfoForm() {
   const { patientId } = useParams();
   const [patient, setPatient] = useState(null);
@@ -250,16 +248,43 @@ export default function PatientInfoForm() {
   const [selectedLesson, setSelectedLesson] = useState("");
   const [showAssignAlert, setShowAssignAlert] = useState(false);
 
-  const [selfAware, setSelfAware] = useState(null);
-  const [lessonEngagement, setLessonEngagement] = useState(null);
-  const [improvementState, setImprovementState] = useState(null);
-  const [errorFrequency, setErrorFrequency] = useState(null);
-  const [progressQuality, setProgressQuality] = useState(null);
-  const [remarks, setRemarks] = useState(null);
-  const [progressScore, setProgressScore] = useState(null);
+  const [selfAware, setSelfAware] = useState(null); // Initialize with null or a default value
+  const [lessonEngagement, setLessonEngagement] = useState(null); // Initialize with null or a default value
+  const [improvementState, setImprovementState] = useState(null); // Initialize with null or a default value
+  const [errorFrequency, setErrorFrequency] = useState(null); // Initialize with null or a default value
+  const [progressQuality, setProgressQuality] = useState(null); // Initialize with null or a default value
+  const [remarks, setRemarks] = useState(""); // Initialize with an empty string
+  const [progressScore, setProgressScore] = useState(null); // Initialize with null or a default value
+  const [loading, setLoading] = useState(true);
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(true);
+  const [lessonCompletion, setLessonCompletion] = useState('');
+
+ // Fetch progress score when the component mounts
+ useEffect(() => {
+  const fetchProgressScore = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}/progress`);
+      const data = await response.json();
+      // Assuming the response contains an array of progress reports
+      if (data.length > 0) {
+        // Get the latest progress report
+        const latestProgressReport = data[data.length - 1];
+        setProgressScore(Number(latestProgressReport.progress_score));
+      } else {
+        setProgressScore(null);
+      }
+    } catch (error) {
+      console.error('Error fetching progress score:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProgressScore();
+}, [patientId]);
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -301,6 +326,7 @@ export default function PatientInfoForm() {
       } else {
         console.error("Failed to fetch patient data.");
       }
+       // Simulate a delay before hiding the loader
        setTimeout(() => {
         setLoadingRecommendations(false);
       }, 2000); 
@@ -348,37 +374,71 @@ export default function PatientInfoForm() {
   const handleSubmitProgress = async (event) => {
     event.preventDefault();
 
+    // Initialize progressScore
+    let progressScore = 0;
+
     try {
-      const formData = new FormData();
-      formData.append("self_aware", selfAware === "true");
-      formData.append("lesson_engagement", lessonEngagement);
-      formData.append("improvement_state", improvementState);
-      formData.append("error_frequency", errorFrequency);
-      formData.append("progress_quality", progressQuality);
-      formData.append("remarks", remarks);
-      formData.append("progress_score", progressScore);
-      if (selectedFile) {
-        formData.append("report_file", selectedFile);
-      }
+        const formData = new FormData();
 
-      const response = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}/progress`, {
-        method: "POST",
-        body: formData,
-      });
+      // Use consistent string values for boolean fields
+      formData.append("self_aware", selfAware === "true" ? "true" : "false"); 
 
-      if (response.ok) {
-        console.log("Progress updated successfully!");
-      } else {
-        console.error("Error updating progress:", response.status);
-      }
+      formData.append("lesson_engagement", lessonEngagement || "");
+      formData.append("improvement_state", improvementState || "");
+      formData.append("error_frequency", errorFrequency || "");
+      formData.append("progress_quality", progressQuality || "");
+      formData.append("remarks", remarks || "");
+        // Calculate progress score
+        if (selfAware === "true") progressScore += 20;
+
+        if (lessonEngagement === "high") progressScore += 30;
+        else if (lessonEngagement === "medium") progressScore += 20;
+        else if (lessonEngagement === "low") progressScore += 10;
+
+        if (improvementState === "improving") progressScore += 30;
+        else if (improvementState === "stable") progressScore += 20;
+        else if (improvementState === "not improving") progressScore += 10;
+
+        if (errorFrequency === "never") progressScore += 20;
+        else if (errorFrequency === "sometimes") progressScore += 10;
+
+        if (progressQuality === "excellent") progressScore += 20;
+        else if (progressQuality === "good") progressScore += 10;
+
+        // Append calculated progress score
+        formData.append("progress_score", progressScore);
+
+        // Append the file (if any)
+        if (selectedFile) {
+            formData.append("report_file", selectedFile);
+        }
+
+        // Send form data via POST request
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}/progress`, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (response.ok) {
+            console.log("Progress updated successfully!");
+            // Optional: Reset form fields, or show a success message to the user
+            // e.g., resetForm(), setShowSuccess(true)
+        } else {
+            console.error("Error updating progress:", response.status);
+            // Optional: Display an error message to the user
+        }
     } catch (error) {
-      console.error("Error updating progress:", error);
+        console.error("Error updating progress:", error);
+        // Optional: Handle errors, e.g., display a notification or error message
     }
-  };
+    setProgressScore(progressScore);
+};
+
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
+
   const handleAssignLesson = async () => {
     try {
       const response = await fetch(
@@ -418,7 +478,7 @@ export default function PatientInfoForm() {
     } catch (error) {
       console.error("Error assigning lesson:", error);
     }
-  
+    console.log('Progress Score:', progressScore);
   };
 
   return (
@@ -509,137 +569,116 @@ export default function PatientInfoForm() {
             <Typography variant="h6">Observations:</Typography>
 
             {/* Self Awareness */}
-            <FormControl component="fieldset" sx={{ marginTop: "18px", marginLeft: "20px" }}>
-              <FormLabel component="legend">Self Awareness:</FormLabel>
-              <RadioGroup
-                row
-                value={selfAware}
-                onChange={(e) => setSelfAware(e.target.value)}
-              >
-                <FormControlLabel value="true" control={<Radio />} label="Yes" />
-                <FormControlLabel value="false" control={<Radio />} label="No" />
-              </RadioGroup>   
+            <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
+  <FormLabel component="legend">Self Awareness:</FormLabel>
+  <RadioGroup row value={selfAware} onChange={(e) => setSelfAware(e.target.value)}>
+    <FormControlLabel value="true" control={<Radio />} label="Yes" />
+    <FormControlLabel value="false" control={<Radio />} label="No" />
+  </RadioGroup>   
 
-            </FormControl>
+</FormControl>
 
-            {/* Lesson Engagement */}
-            <FormControl component="fieldset" sx={{ marginTop: "18px", marginLeft: "250px" }}>
-              <FormLabel component="legend">Lesson Engagement:</FormLabel>
-              <RadioGroup
-                row
-                value={lessonEngagement}
-                onChange={(e) => setLessonEngagement(e.target.value)}
-              >
-                <FormControlLabel value="high" control={<Radio />} label="High" />
-                <FormControlLabel
-                  value="medium"
-                  control={<Radio />}
-                  label="Medium"
-                />
-                <FormControlLabel   
- value="low" control={<Radio />} label="Low" />
-              </RadioGroup>
-            </FormControl>   
+{/* Lesson Engagement */}
+<FormControl component="fieldset" sx={{ marginTop: "18px" }}>
+  <FormLabel component="legend">Lesson Engagement:</FormLabel>
+  <RadioGroup row value={lessonEngagement} onChange={(e) => setLessonEngagement(e.target.value)}>
+    <FormControlLabel value="high" control={<Radio />} label="High" />
+    <FormControlLabel value="medium" control={<Radio />} label="Medium" />
+    <FormControlLabel value="low" control={<Radio />} label="Low" />
+  </RadioGroup>
+</FormControl>   
 
 
-            {/* Improvement State */}
-            <FormControl component="fieldset" sx={{ marginTop: "18px", marginLeft: "20px" }}>
-              <FormLabel component="legend">Improvement State:</FormLabel>
-              <RadioGroup
-                row
-                value={improvementState}
-                onChange={(e) => setImprovementState(e.target.value)}
-              >
-                <FormControlLabel
-                  value="improving"
-                  control={<Radio />}
-                  label="Improving"
-                />
-                <FormControlLabel value="stable" control={<Radio />} label="Stable" />
-                <FormControlLabel
-                  value="not improving"
-                  control={<Radio />}
-                  label="Not improving"
-                />
-              </RadioGroup>
-            </FormControl>
+{/* Improvement State */}
+<FormControl component="fieldset" sx={{ marginTop: "18px" }}>
+  <FormLabel component="legend">Improvement State:</FormLabel>
+  <RadioGroup row value={improvementState} onChange={(e) => setImprovementState(e.target.value)}>
+    <FormControlLabel value="improving" control={<Radio />} label="Improving" />
+    <FormControlLabel value="stable" control={<Radio />} label="Stable" />
+    <FormControlLabel value="not improving" control={<Radio />} label="Not improving" />
+  </RadioGroup>
+</FormControl>
 
-            {/* Error Frequency */}
-            <FormControl component="fieldset" sx={{ marginTop: "18px", marginLeft: "30px" }}>
-              <FormLabel component="legend">Error Frequency:</FormLabel>
-              <RadioGroup
-                row
-                value={errorFrequency}
-                onChange={(e) => setErrorFrequency(e.target.value)}
-              >
-                <FormControlLabel value="never" control={<Radio />} label="Never" />
-                <FormControlLabel
-                  value="sometimes"
-                  control={<Radio />}
-                  label="Sometimes"
-                />
-                <FormControlLabel value="always" control={<Radio />} label="always" />
-              </RadioGroup>
-            </FormControl>
+{/* Error Frequency */}
+<FormControl component="fieldset" sx={{ marginTop: "18px" }}>
+  <FormLabel component="legend">Error Frequency:</FormLabel>
+  <RadioGroup row value={errorFrequency} onChange={(e) => setErrorFrequency(e.target.value)}>
+    <FormControlLabel value="never" control={<Radio />} label="Never" />
+    <FormControlLabel value="sometimes" control={<Radio />} label="Sometimes" />
+    <FormControlLabel value="always" control={<Radio />} label="always" />
+  </RadioGroup>
+</FormControl>
 
-            {/* Progress Quality */}
-            <FormControl component="fieldset" sx={{ marginTop: "18px", marginLeft: "20px" }}>
-              <FormLabel component="legend">Progress Quality:</FormLabel>
-              <RadioGroup
-                row
-                value={progressQuality}
-                onChange={(e) => setProgressQuality(e.target.value)}
-              >
-                <FormControlLabel
-                  value="excellent"
-                  control={<Radio />}
-                  label="Excellent"
-                />
-                <FormControlLabel value="good" control={<Radio />} label="Good" />
-                <FormControlLabel value="poor"   
+{/* Progress Quality */}
+<FormControl component="fieldset" sx={{ marginTop: "18px" }}>
+  <FormLabel component="legend">Progress Quality:</FormLabel>
+  <RadioGroup row value={progressQuality} onChange={(e) => setProgressQuality(e.target.value)}>
+    <FormControlLabel value="excellent" control={<Radio />} label="Excellent" />
+    <FormControlLabel value="good" control={<Radio />} label="Good" />
+    <FormControlLabel value="poor"   
  control={<Radio />} label="Poor" />
-              </RadioGroup>
-            </FormControl>
+  </RadioGroup>
+</FormControl>
 
-            <TextField
-                fullWidth
-                label="Remarks"
-                multiline
-                rows={3}
-                sx={{ marginTop: "16px" }}
-                value={remarks || ""} // Ensure 'remarks' is always a string
-                onChange={(e) => setRemarks(e.target.value)}
-              />
+           <Box
+      sx={{
+        border: "1px dashed #ccc",
+        padding: "16px",
+        textAlign: "center",
+        borderRadius: "8px",
+        marginTop: "16px",
+      }}
+    >
+      <Typography>Click to Upload</Typography>
+      <Button
+        variant="outlined"
+        component="label"
+        sx={{ marginTop: "16px" }}
+      >
+        Upload
+        <input type="file" hidden onChange={handleFileChange} />
+      </Button>
+
+      {/* Display the filename */}
+      {selectedFile && (
+        <Typography variant="body2" sx={{ marginTop: "8px" }}>
+          Selected file: {selectedFile.name}
+        </Typography>
+      )}
+    </Box>
+    <TextField
+  fullWidth
+  label="Remarks"
+  multiline
+  rows={3}
+  sx={{ marginTop: "16px" }}
+  value={remarks || ""}
+  onChange={(e) => setRemarks(e.target.value)}
+/>
 
               {/* Lesson Completion Section */}
               <Box
-                sx={{
-                  border: '1px solid #ccc',
-                  padding: '16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#fff',
-                  boxShadow: 3,
-                  marginTop: '16px',
-                }}
-              >
-                <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                  Lesson Completion
-                </Typography>
-                <Typography variant="body1" sx={{ marginTop: '8px' }}>
-                  {/* This text will be generated later */}
-                  Lesson completion details will be displayed here.
-                </Typography>
-              </Box>
+  sx={{
+    border: "1px solid #ccc",
+    padding: "16px",
+    borderRadius: "8px",
+    backgroundColor: "#fff",
+    boxShadow: 3,
+    marginTop: "16px",
+  }}
+>
+  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+    Lesson Completion
+  </Typography>
+  <Typography variant="body1" sx={{ marginTop: "8px" }}>
+    {progressScore === null
+      ? "No observations recorded yet"
+      : progressScore >= 70
+      ? "Proceed to the next lesson"
+      : "Stay in the current lesson"}
+  </Typography>
+  </Box>
 
-              <FormControl component="fieldset" sx={{ marginTop: "25px" }}>
-                <FormLabel component="legend">
-                  Is the patient ready to proceed to the next lesson?
-                </FormLabel>
-                <RadioGroup row>
-                  <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                  <FormControlLabel value="no" control={<Radio />} label="No" />
-                </RadioGroup>
-              </FormControl>
 <br/>
               <Button type="submit" variant="contained" sx={{ marginTop: "56px", marginLeft: "20px", backgroundColor: "#2D848B", color: "#fff"
               }}>
@@ -662,8 +701,8 @@ export default function PatientInfoForm() {
     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
       Lesson Recommendations:
     </Typography>
-{/* Conditionally render loading indicator or recommendations */}
-{loadingRecommendations ? (
+ {/* Conditionally render loading indicator or recommendations */}
+ {loadingRecommendations ? (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100px" }}>
               <CircularProgress />
               <Typography variant="body1" sx={{ marginLeft: "10px" }}>
