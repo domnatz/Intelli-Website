@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
   contact_number: String, 
   email_address: { type: String, required: true },
   relationship_to_patient: String, 
+  verified: { type: Boolean, default: false },
+  verificationToken: String, // Add this line
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now }
 });
