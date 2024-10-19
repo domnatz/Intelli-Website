@@ -5,6 +5,7 @@ const Therapist = require('./models/therapist');
 const Appointment = require('./models/appointment');
 const Schedule = require('./models/schedule');
 const Patient = require('./models/patient');
+const Progress = require('./models/progress'); 
 const Lesson = require('./models/lesson');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
