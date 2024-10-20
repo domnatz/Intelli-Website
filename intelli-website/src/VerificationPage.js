@@ -21,8 +21,8 @@ const VerificationPage = () => {
                     setVerificationStatus('success');
     
                     setTimeout(() => {
-                        navigate(data.redirectUrl);  
-                    }, 5000);
+                        window.location.replace(data.redirectUrl); 
+                    }, 3000);
                 } else {
                     console.error('Verification failed:', response.status, response.statusText); // Log the error
                     setVerificationStatus('failed');
