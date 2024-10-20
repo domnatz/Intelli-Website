@@ -16,7 +16,6 @@ const Sidebar = React.memo(({ userRole, onLogout }) => {
 
   useEffect(() => {
     setInternalUserRole(userRole); // Update internalUserRole when userRole changes
-    console.log("userRole received in Sidebar:", userRole); // Debugging to trace updates
   }, [userRole]);
 
 
@@ -83,11 +82,13 @@ const Sidebar = React.memo(({ userRole, onLogout }) => {
         </li>
 
         <li>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <AddchartIcon sx={{ mr: 3 }} />
-            <Typography variant="p">Monthly Report</Typography>
-          </Box>
-        </li>
+          <Link to="/MonthlyReport" className="sidebar-link">
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <AddchartIcon sx={{ mr: 3 }} />
+              <Typography variant="p">Monthly Report</Typography>
+            </Box>
+          </Link>
+          </li>
       </ul>
     </div>
   );

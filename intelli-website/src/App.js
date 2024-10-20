@@ -13,6 +13,7 @@ import Sidebar from "./pages/admin/Sidebar";
 import AppointmentPage from "./pages/guardian/Appointments";
 import StaffRegistrationPage from "./pages/SignupStaff";
 import ProgressReport from "./pages/admin/ProgressReport";
+import MonthlyReportPage from "./pages/admin/MonthlyReport"; 
 import PatientProfilesPage from "./pages/admin/Profiles";
 
 import { useNavigate } from "react-router-dom";
@@ -104,6 +105,7 @@ export default function App() {
           <Route path="/therapistSchedule" element={<TherapistSchedulePage />} />
           <Route path="/upcomingAppStaff" element={<UpcomingAppStaffPage />} />
           <Route path="/Profiles" element={<PatientProfilesPage />} />
+          <Route path="/MonthlyReport" element={<MonthlyReportPage />} />
         </Route>
 
         {/* Protected Route for Staff Registration (accessible only to admins) */}
