@@ -59,7 +59,9 @@ export default function TherapistSchedule() {
     scheduleId: schedule._id,
   }));
 
-  const handleDeleteSchedule = async (scheduleId) => {
+  const handleDeleteSchedule = async (event) => {
+    const scheduleId = event.scheduleId; 
+
     if (window.confirm("Are you sure you want to delete this schedule?")) {
         // Confirmation dialog
         try {

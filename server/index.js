@@ -11,10 +11,12 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const jwt = require('jsonwebtoken'); 
 const multer = require('multer');
+const session = require('express-session');
 const upload = multer();const nodemailer = require('nodemailer'); 
 const crypto = require('crypto'); 
 const app = express();
 
+const secretKey = crypto.randomBytes(32).toString('hex');
 const PORT = process.env.PORT || 3001;
 const dotenv = require('dotenv');
 dotenv.config()
@@ -26,7 +28,16 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
+app.use(session({
+  secret: secretKey,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false,
+    httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+    maxAge: 3600000 // Example: 1 hour session expiration
+  }
+}));
 // Connect to MongoDB 
 mongoose.connect(process.env.MONGODB_CONNECTION)
   .then(() => console.log('Connected to MongoDB (Intelli-Website database)'))
@@ -220,26 +231,37 @@ app.post('/api/login', async (req, res) => {
     }
     console.log("Password valid for user:", username);
 
-  //  if (!user.verified) {
-  //    console.log("Email not verified for user:", username);
-   // }
-
     const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET_KEY || 'zgbxYzATJkYibsU8lnfY0Uc65ibNzyJE');
     console.log("JWT generated for user:", username);
 
-    res.json({ 
-      message: 'Login successful!', 
-      token: token,  
-      user: { 
-        id: user._id, 
-        username: user.username, 
-        role: user.role 
+    req.session.userId = user._id; // Store user ID in the session
+    console.log(req.session); // Log the session information
+
+    res.json({
+      message: 'Login successful!',
+      user: {
+        id: user._id, // Or another unique identifier
+        username: user.username,
+        role: user.role // Explicitly include the user's role
       }
-    }); 
+    });
   } catch (error) {
     console.error('Error during login:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+});
+
+app.post('/api/logout', (req, res) => {
+  //Destroys the current session
+  req.session.destroy(err => {
+    if (err) {
+      console.error('Error destroying session:', err); //only for destroying or clearing a session
+      return res.status(500).json({ error: 'Server error' });
+    }
+
+
+    res.json({ message: 'Logout successful' });
+  });
 });
 
 // Therapist Schedule Route
@@ -435,41 +457,53 @@ app.post('/api/appointments', async (req, res) => {
   try {
       console.log('Received appointment data:', req.body);
 
+
       // Extract patient_id and the rest of the appointment data
-      const { patient_id, ...restOfAppointmentData } = req.body;
+      const { patient_id, guardian_id, ...restOfAppointmentData } = req.body;
+
 
       // Check if patient_id is provided
       if (!patient_id) {
           return res.status(400).json({ error: 'Patient ID is required' });
       }
+     
+      if (!guardian_id) {
+        return res.status(401).json({ error: 'Guardian ID not found. Please log in.' });
+      }
 
-      // More explicit validation and type checking 
+
+      // More explicit validation and type checking
       if (typeof restOfAppointmentData.appointment_date !== 'string') {
           return res.status(400).json({ error: 'Invalid appointment date. Please provide a string in YYYY-MM-DD format.' });
       }
-
-      if (typeof restOfAppointmentData.start_time !== 'string' || 
+      if (typeof restOfAppointmentData.start_time !== 'string' ||
           typeof restOfAppointmentData.end_time !== 'string') {
           return res.status(400).json({ error: 'Invalid appointment time. Please provide start_time and end_time as ISO strings.' });
       }
+
 
       // Convert date and time strings to Date objects
       restOfAppointmentData.appointment_date = new Date(restOfAppointmentData.appointment_date);
       restOfAppointmentData.start_time = new Date(restOfAppointmentData.start_time);
       restOfAppointmentData.end_time = new Date(restOfAppointmentData.end_time);
 
+
       // Create a new appointment document
       const newAppointment = new Appointment({
           patient_id,
+          guardian_id,
           ...restOfAppointmentData
       });
+
 
       // Save the appointment to the database
       const savedAppointment = await newAppointment.save();
 
+
       res.status(201).json(savedAppointment);
   } catch (error) {
       console.error('Error creating appointment:', error);
+
 
       // Handle validation errors from Mongoose
       if (error.name === 'ValidationError') {
@@ -477,24 +511,30 @@ app.post('/api/appointments', async (req, res) => {
           return res.status(400).json({ error: errors });
       }
 
+
       // Handle duplicate key errors (if you have unique constraints in your schema)
       if (error.code === 11000) {
           return res.status(400).json({ error: 'An appointment with this patient and time already exists' });
       }
+
 
       // Handle other Mongoose errors (e.g., CastError for invalid data types)
       if (error instanceof mongoose.Error) {
           return res.status(400).json({ error: error.message });
       }
 
+
       // Handle any other unexpected errors
       return res.status(500).json({ error: 'Internal Server Error. Please check server logs for details.' });
   }
 });
+
 // Patient routes
-app.post('/api/patients', async (req, res) => {
+app.post('/api/patients/', async (req, res) => {
   try {
+      console.log(req.session);
       console.log('Received POST request to /api/patients');
+
 
       const {
           guardian_id,
@@ -513,6 +553,18 @@ app.post('/api/patients', async (req, res) => {
           therapy_types,
       } = req.body;
 
+
+      if (!guardian_id) {
+        return res.status(400).json({ error: 'Guardian ID is required' });
+      }
+        console.log("Request body:", req.body);
+
+
+      if (!mongoose.Types.ObjectId.isValid(guardian_id)) {
+        return res.status(400).json({ error: 'Invalid guardian ID format.' });
+      }
+
+
       // Basic input validation - check if required fields are present
       const requiredFields = [
           'patient_name',
@@ -522,16 +574,19 @@ app.post('/api/patients', async (req, res) => {
           'physician_name'
       ];
 
+
       for (const field of requiredFields) {
           if (!req.body[field]) {
               return res.status(400).json({ error: `Missing required field: ${field}` });
           }
       }
 
-      // Additional validation and type checking 
+
+      // Additional validation and type checking
       if (typeof req.body.patient_age !== 'number' || isNaN(req.body.patient_age)) {
           return res.status(400).json({ error: 'Invalid patient age. Please provide a number.' });
       }
+
 
       // Conditionally check for sle_concerns only if therapy_types includes 'slp'
       if (therapy_types.includes('slp')) {
@@ -543,9 +598,10 @@ app.post('/api/patients', async (req, res) => {
           }
       }
 
+
       // Provide default values for missing fields
       const patientData = {
-          guardian_id,
+          guardian_id: guardian_id,
           patient_name,
           date_of_birth,
           patient_sex,
@@ -553,13 +609,14 @@ app.post('/api/patients', async (req, res) => {
           physician_name,
           diagnosis,
           siblings,
-          sle_concerns: sle_concerns || {}, 
-          sle_receptive_skills: sle_receptive_skills || {}, 
-          sle_motor_skills: sle_motor_skills || {}, 
-          school_skills: school_skills || {}, 
-          physical_tasks: physical_tasks || {}, 
+          sle_concerns: sle_concerns || {},
+          sle_receptive_skills: sle_receptive_skills || {},
+          sle_motor_skills: sle_motor_skills || {},
+          school_skills: school_skills || {},
+          physical_tasks: physical_tasks || {},
           therapy_types,
       };
+
 
       let patient;
       if (req.body.patient_id) {
@@ -568,6 +625,7 @@ app.post('/api/patients', async (req, res) => {
           if (!patient) {
               return res.status(404).json({ error: 'Patient not found' });
           }
+
 
           // Merge the incoming data with the existing patient data
           for (const key in req.body) {
@@ -580,10 +638,12 @@ app.post('/api/patients', async (req, res) => {
           patient = new Patient(patientData);
       }
 
+
       const savedPatient = await patient.save();
       res.status(201).json(savedPatient);
   } catch (error) {
       console.error('Error creating patient:', error);
+
 
       if (error.name === 'ValidationError') {
           const errors = Object.values(error.errors).map(err => err.message);
@@ -821,28 +881,56 @@ app.get('/api/patients/:patientId/progress', async (req, res) => {
   }
 });
 
-// ... other routes and middleware
+app.get('/api/patients/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+   
+    console.log('Fetching patient list for: ', userId);
+   
+    const patients = await Patient.find();
+    const filteredPatients = patients.filter(patient => {
+      return patient.guardian_id && patient.guardian_id.equals(userId);
+    });
+     
+      res.json(filteredPatients);
+      console.log(filteredPatients);
 
-/*app.get('/api/therapists-avail', async (req, res) => {
+
+
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+});
+
+//Therapist Matching
+app.get('/api/therapists-avail', async (req, res) => {
   try {
     let { selectedSchedule, selectedDate } = req.query;
 
-    console.log('Received selectedSchedule:', selectedSchedule);
+
     console.log('Received selectedDate:', selectedDate);
+    console.log('Received selectedSchedule:', selectedSchedule);
+
 
     if (!selectedSchedule || !selectedDate) {
       // Handle missing parameters explicitly
-      return res.status(400).json({ error: 'Missing schedule or date' }); 
+      return res.status(400).json({ error: 'Missing schedule or date' });
     }
+
 
     // Convert selectedDate to a Date object and set it to midnight UTC
     const selectedDateObj = new Date(selectedDate);
     selectedDateObj.setUTCHours(0, 0, 0, 0);
 
+
     // Fetch therapists and populate their schedules
     const therapists = await Therapist.find().populate('schedule');
 
+
     console.log('Fetched therapists (before filtering):', therapists);
+
 
     // Extract start and end times from selectedSchedule
     let startTimeStr, endTimeStr;
@@ -851,8 +939,9 @@ app.get('/api/patients/:patientId/progress', async (req, res) => {
     } else {
       // If the format is not as expected, log an error and return an error response
       console.error('Unexpected selectedSchedule format:', selectedSchedule);
-      return res.status(400).json({ error: 'Invalid time range format' }); 
+      return res.status(400).json({ error: 'Invalid time range format' });
     }
+
 
     // Create Date objects for the start and end of the selected time slot (in UTC)
     const startTimeUTC = new Date(Date.UTC(
@@ -870,11 +959,13 @@ app.get('/api/patients/:patientId/progress', async (req, res) => {
       parseInt(endTimeStr.split(':')[1], 10)
     ));
 
+
     // Filter therapists
     const availableTherapists = therapists.filter(therapist => {
       if (!therapist.schedule || !Array.isArray(therapist.schedule)) {
         return false;
       }
+
 
       return therapist.schedule.some(therapistSchedule => {
         // Check for valid schedule entry and Date objects
@@ -888,22 +979,26 @@ app.get('/api/patients/:patientId/progress', async (req, res) => {
           return false;
         }
 
+
         // Check if the schedule's date and time range match
         const isDateMatch = therapistSchedule.start_time.getUTCFullYear() === selectedDateObj.getUTCFullYear() &&
           therapistSchedule.start_time.getUTCMonth() === selectedDateObj.getUTCMonth() &&
           therapistSchedule.start_time.getUTCDate() === selectedDateObj.getUTCDate();
+       
+          const isScheduleMatch = therapistSchedule.start_time.getTime() < endTimeUTC.getTime() &&
+          therapistSchedule.end_time.getTime() > startTimeUTC.getTime();
 
-        const isScheduleMatch = therapistSchedule.start_time.getTime() <= startTimeUTC.getTime() &&
-          therapistSchedule.end_time.getTime() >= endTimeUTC.getTime() &&
-          therapistSchedule.schedule === selectedSchedule; // Directly compare with selectedSchedule
 
         return isScheduleMatch && isDateMatch;
       });
     });
 
+
     console.log('Available therapists:', availableTherapists);
 
+
     res.json(availableTherapists);
+
 
   } catch (error) {
     console.error('Error fetching therapists:', error);
@@ -911,7 +1006,10 @@ app.get('/api/patients/:patientId/progress', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }
-}); */
+});
+
+
+
 // Route to handle creating new schedules
 app.post('/api/schedules', async (req, res) => {
   try {

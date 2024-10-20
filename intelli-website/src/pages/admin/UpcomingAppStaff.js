@@ -1,26 +1,64 @@
-import React, { useState, useEffect } from "react";
-import "./UpcomingAppStaff.css";
-import Sidebar from "./Sidebar";
-import { Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import './UpcomingAppStaff.css';
+import Sidebar from './Sidebar';
+import {
+  Box,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Button
+} from '@mui/material';
+
 export default function UpcomingAppStaff() {
-    const [appointments, setAppointments] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                const response = await fetch(
-                    `${process.env.REACT_BACKEND_API}/api/appointments`
-                );
+                const response = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`);
+
+                
                 if (!response.ok) {
                     throw new Error("Error fetching appointments");
                 }
                 const data = await response.json();
                 console.log("Fetched appointments data:", data);
-
-                // No filtering needed - display all appointments
-                setAppointments(data);
+                
+                const appointmentsWithTherapists = await Promise.all(
+                    data.map(async (appointment) => {
+                        // Extract date and time range from appointment
+                        const appointmentDate = new Date(appointment.start_time);
+                        const formattedDate = appointmentDate.toLocaleDateString('en-CA');
+                        const startTime = new Date(appointment.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const selectedSchedule = `${startTime} - ${endTime}`;
+                    
+                        // Fetch therapists for this appointment's date and time
+                        const therapistsResponse = await fetch(
+                            `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`
+                        );
+                        if (!therapistsResponse.ok) {
+                            throw new Error("Error fetching therapists for appointment");
+                        }
+                        const therapistsData = await therapistsResponse.json();
+    
+                        // Assign the first matching therapist (you might want to refine this logic)
+                        appointment.therapistName = therapistsData.length > 0 
+                            ? therapistsData[0].therapist_name 
+                            : "No Available Therapist";
+    
+                        return appointment;
+                    })
+                );
+    
+                setAppointments(appointmentsWithTherapists);
             } catch (err) {
                 console.error("Error fetching appointments:", err);
                 setError(
@@ -124,97 +162,109 @@ export default function UpcomingAppStaff() {
     };
 
     return (
-        <div className="upcoming-app-staff">
-            <Sidebar />
-            <div className="upcoming-app-content">
-                <h6 className="therapist-schedule-title">
-                    Upcoming Appointments
-                </h6>
-                <div className="appointments-container">
-                    {loading && <p>Loading appointments...</p>}
-                    {error && <p>{error}</p>}
+        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <Sidebar />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          padding: '30px',
+          marginLeft: '280px', // Align with sidebar
+          transition: 'margin 0.3s ease',
+        }}
+      >
+        <Typography
+          variant="h3"
+          gutterBottom
+          sx={{ textAlign: 'center', marginBottom: '20px', marginTop: '20px', color: '#2d848b', fontWeight: 'bolder' }}
+        >
+          Upcoming Appointments
+        </Typography>
 
-                    {!loading && !error && (
-                        <table className="appointments-table">
-                            <thead>
-                                <tr>
-                                    <th>Appointment Type</th>
-                                    <th>Patient Name</th>
-                                    <th>Date</th>
-                                    <th>Start Time</th>
-                                    <th>End Time</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {appointments.map((appointment) => (
-                                    <tr key={appointment._id}>
-                                        <td>
-                                            {appointment.appointment_type}
-                                        </td>
+        <TableContainer component={Paper} sx={{ borderRadius: '8px', boxShadow: 3 }}>
+          <Table aria-label="appointments table" sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: '#f4f4f4' }}>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>Appointment Type</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>Assigned Therapist</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>Patient Name</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>Start Time</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>End Time</TableCell>
+                <TableCell sx={{ fontWeight: 'bold', color: '#3F4662' }}>Status</TableCell>
+                <TableCell sx={{ textAlign: 'center' }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loading && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    Loading appointments...
+                  </TableCell>
+                </TableRow>
+              )}
+              {error && (
+                <TableRow>
+                  <TableCell colSpan={7} align="center">
+                    {error}
+                  </TableCell>
+                </TableRow>
+              )}
+              {!loading &&
+                !error &&
+                appointments.map((appointment) => (
+                  <TableRow key={appointment._id}>
+                    <TableCell>{appointment.appointment_type}</TableCell>
+                    <TableCell>{appointment.therapistName}</TableCell>
+                    <TableCell>{appointment.patient_name}</TableCell>
+                    <TableCell>
+                    {(() => {
+                        const appointmentDate = new Date(appointment.start_time);
+                        const formattedDate = appointmentDate.toLocaleDateString('en-US');
+                        return formattedDate;
+                    })()}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(appointment.start_time).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(appointment.end_time).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </TableCell>
+                    <TableCell>{appointment.appointment_status}</TableCell>
+                    <TableCell sx={{ textAlign: 'center' }}>
+                      <Button
+                        variant="contained"
+                        color="success"
+                        sx={{ marginRight: 1, backgroundColor: '#2D848B', color: '#fff'  }}
+                        onClick={() => handleConfirmAppointment(appointment._id)}
+                      >
+                        Confirm
+                      </Button>
 
-                                        <td>{appointment.patient_name}</td>
-                                        <td>
-                                            {new Date(
-                                                appointment.appointment_date
-                                            ).toLocaleDateString()}
-                                        </td>
-                                        <td>
-                                            {new Date(
-                                                appointment.start_time
-                                            ).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </td>
-                                        <td>
-                                            {new Date(
-                                                appointment.end_time
-                                            ).toLocaleTimeString([], {
-                                                hour: "2-digit",
-                                                minute: "2-digit",
-                                            })}
-                                        </td>
-                                        <td>
-                                            {appointment.appointment_status}
-                                        </td>
-                                        <td>
-                                        <Button
-    variant="contained"
-    onClick={() => handleConfirmAppointment(appointment._id)}
-    sx={{
-      backgroundColor: 'green', // Directly set the background color to green
-      color: 'white', // Set text color to white for contrast
-      marginRight: '5px',
-      '&:hover': {
-        backgroundColor: 'darkgreen', // Darker green on hover
-      },
-    }}
-  >
-    Confirm
-  </Button>
-  <Button
-    variant="contained"
-    onClick={() => handleDeleteAppointment(appointment._id)}
-    sx={{
-      backgroundColor: 'red', // Directly set the background color to red
-      color: 'white', // Set text color to white for contrast
-      '&:hover': {
-        backgroundColor: 'darkred', // Darker red on hover
-      },
-    }}
-  >
-    Delete
-  </Button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
+                      <Button
+                        aria-label="delete"
+                        color="error"
+                        sx={{ marginRight: 1,
+                          backgroundColor: '#e53935',
+                          color: '#fff',
+                        '&:hover': { backgroundColor: '#d32f2f' }, }}
+                        onClick={() => handleDeleteAppointment(appointment._id)}
+                        >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </Box>
+  );
 }

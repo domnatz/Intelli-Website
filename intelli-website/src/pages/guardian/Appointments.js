@@ -8,10 +8,9 @@ import utc from 'dayjs/plugin/utc';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import   
- TextField from '@mui/material/TextField';   
+import TextField from '@mui/material/TextField';   
  
- import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import IconButton from '@mui/material/IconButton';
@@ -19,6 +18,8 @@ import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 
 import logo from '../../images/logo.png';
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 // Extend Day.js with the utc plugin
 dayjs.extend(utc);
@@ -30,7 +31,11 @@ const CustomAccordion = styled(Accordion)({
   borderRadius: '20px',
   margin: '10px',
   justifyContent: 'center',
-  textAlign: 'center'
+  textAlign: 'center',
+
+  '@media (max-width: 600px)': {
+    borderRadius: '10px', // Smaller border radius on phones
+  }
 });
 
 
@@ -65,6 +70,7 @@ export default function Appointments({ therapyType, isLoggedIn, onLogout  }) { /
   useEffect(() => {
     console.log("therapyType received in Appointments:", therapyType); 
 }, [therapyType]); 
+
 const handleTimeSelection = (time) => {
   // Split the time range into start and end times
   const [startTimeStr, endTimeStr] = time.split('-');
@@ -91,6 +97,10 @@ const handleTimeSelection = (time) => {
         alert("Please select a form before continuing!");
         return;
     }
+
+    setCurrentTherapyType(form === 'form1' ? 'slp': 'ot'); //sets the therapyType when selecting a form.
+    console.log("currentTherapyType set to:", currentTherapyType);
+    therapyType = currentTherapyType;
 
     setActiveForm(form);
     setExpanded(nextPanel);
@@ -121,11 +131,15 @@ const handleSubmitAppointment = async () => {
   try {
     // 1. Save patient data (if new patient) or update existing patient
     let patientId = patientData?._id;
+    const guardian_id = sessionStorage.getItem('userId'); //sets the guardian_id to the current user's userId
+
     if (!patientId) {
+        
         const savePatientResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/patients`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(patientData) // Send the full patientData here
+            body: JSON.stringify({...patientData, guardian_id}), // Send the full patientData here
+            credentials: 'include' 
         });
 
         if (!savePatientResponse.ok) {
@@ -161,12 +175,13 @@ const handleSubmitAppointment = async () => {
     // 2. Create the appointment (only if patientId is defined)
     if (patientId) {
       console.log("currentTherapyType used for appointment creation:", currentTherapyType); 
-
+      
       const createAppointmentResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...patientData, 
+          ...patientData,
+          guardian_id: guardian_id, 
           appointment_date: formattedSelectedDate, 
           start_time: selectedTime.start.toISOString(),
           end_time: selectedTime.end.toISOString(),     
@@ -174,6 +189,7 @@ const handleSubmitAppointment = async () => {
           patient_name: patientData.patient_name,
           appointment_type: currentTherapyType === 'slp' ? 'Speech Therapy' : 'Occupational Therapy', 
           appointment_status: 'Pending', 
+          therapyType: currentTherapyType,
           // ... add other appointment-related data as needed
         })
       });
@@ -262,8 +278,8 @@ const submitAssessmentData = async (patientData) => {
               Home
             </Link>
           </li>
-          <li className="apt-list">
-            <Link>
+          <li className="apt-list"> {/* Added */}
+            <Link to="/progress" className="patientProgress">
               Child's Progress
             </Link>
           </li>
