@@ -8,7 +8,7 @@ import utc from 'dayjs/plugin/utc';
 import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
-import TextField from '@mui/material/TextField';   
+import TextField from '@mui/material/TextField';   
  
 import { Link } from 'react-router-dom';
 
@@ -159,7 +159,7 @@ const handleSubmitAppointment = async () => {
             delete dataToUpdate.sle_motor_skills;
         }
 
-        const updatePatientResponse = await fetch(`/api/patients/${patientId}`, {
+        const updatePatientResponse = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(dataToUpdate),

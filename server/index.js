@@ -258,8 +258,6 @@ app.post('/api/logout', (req, res) => {
       console.error('Error destroying session:', err); //only for destroying or clearing a session
       return res.status(500).json({ error: 'Server error' });
     }
-
-
     res.json({ message: 'Logout successful' });
   });
 });
@@ -450,8 +448,6 @@ app.delete('/api/therapists/:therapistId', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-
 
 app.post('/api/appointments', async (req, res) => {
   try {
@@ -658,6 +654,51 @@ app.post('/api/patients/', async (req, res) => {
   }
 });
 
+app.get('/api/patients/:patientId', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const patient = await Patient.findById(patientId);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.json(patient);
+  } catch (error) {
+    console.error('Error fetching patient:', error);
+    res.status(500).json({ error: 'Failed to fetch patient' });
+  }
+});
+
+
+app.get('/api/patients2/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    console.log('Fetching patient list for userId:', userId);
+
+    // 1. Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // 2. Find patients associated with the guardian
+    const patients = await Patient.find({ guardian_id: userId });
+
+    // 3. Check if patients were found
+    if (patients.length === 0) {
+      console.log('No patients found for guardian:', userId);
+      return res.status(404).json({ error: 'No patients found for this guardian' });
+    }
+
+    console.log('Patients found:', patients);
+    res.json(patients);
+
+  } catch (error) {
+    console.error('Error fetching patients:', error);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+});
+
 app.post('/api/lessons', async (req, res) => {
   try {
     console.log('Received lesson data:', req.body);  // Log the received data
@@ -762,31 +803,34 @@ app.delete('/api/patients/:patientId/assigned-lessons/:lessonId', async (req, re
   }
 });
 
-app.get('/api/patients', async (req, res) => { 
+app.get('/api/patients', async (req, res) => {
   try {
-    const patients = await Patient.find(); // Fetch all patients from the database
+    console.log('Fetching patients from the database...');
+    const patients = await Patient.find();
+    console.log('Fetched patients:', patients);
     res.json(patients);
   } catch (error) {
     console.error('Error fetching patients:', error);
-    res.status(500).json({ error: 'Failed to fetch patients' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-app.get('/api/patients/:patientId', async (req, res) => {
+app.get('/api/patients/:patientId/assigned-lessons', async (req, res) => {
   try {
-    const patientId = req.params.patientId;
-    const patient = await Patient.findById(patientId);
+      const patientId = req.params.patientId;
+      // Fetch the patient, including their assigned lessons
+      const patient = await Patient.findById(patientId); 
 
-    if (!patient) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
+      if (!patient) {
+          return res.status(404).json({ error: 'Patient not found' });
+      }
 
-    res.json(patient);
+      res.json(patient.assignedLessons); // Send the assignedLessons array
   } catch (error) {
-    console.error('Error fetching patient:', error);
-    res.status(500).json({ error: 'Failed to fetch patient' });
+      console.error('Error fetching assigned lessons:', error);
+      res.status(500).json({ error: 'Failed to fetch assigned lessons' });
   }
 });
+
 
 app.post('/api/patients/:patientId/assign-lesson', async (req, res) => {
   try {
@@ -866,6 +910,43 @@ app.post('/api/patients/:patientId/progress', upload.single('report_file'), asyn
   }
 });
 
+app.post('/api/patients/:patientId/progress', upload.single('report_file'), async (req, res) => { 
+  console.log(req.body); 
+  try {
+      const patientId = req.params.patientId;
+      const progressData = req.body;
+
+      // Log the request body to check if all fields are received
+      console.log('Received progress data:', progressData); 
+
+      let reportFile = null;
+      if (req.file) {
+          reportFile = {
+              filename: req.file.originalname,
+              contentType: req.file.mimetype,
+              data: req.file.buffer,
+          };
+      }
+
+      const newProgress = new Progress({
+          patient_id: patientId,
+          self_aware: progressData.self_aware === "true",
+          lesson_engagement: progressData.lesson_engagement,
+          improvement_state: progressData.improvement_state,
+          error_frequency: progressData.error_frequency,
+          progress_quality: progressData.progress_quality,
+          remarks: progressData.remarks,
+          progress_score: progressData.progress_score, 
+          report_file: reportFile,
+      });
+
+      const savedProgress = await newProgress.save();
+      res.status(201).json(savedProgress);
+  } catch (error) {
+      console.error('Error updating patient progress:', error);
+      res.status(500).json({ error: 'Failed to update patient progress' });
+  }
+});
 
 app.get('/api/patients/:patientId/progress', async (req, res) => {
   try {
@@ -881,30 +962,25 @@ app.get('/api/patients/:patientId/progress', async (req, res) => {
   }
 });
 
-app.get('/api/patients/:userId', async (req, res) => {
+app.get('/api/patients/:patientId/progress/:progressId/file', async (req, res) => {
   try {
-    const userId = req.params.userId;
-   
-    console.log('Fetching patient list for: ', userId);
-   
-    const patients = await Patient.find();
-    const filteredPatients = patients.filter(patient => {
-      return patient.guardian_id && patient.guardian_id.equals(userId);
-    });
-     
-      res.json(filteredPatients);
-      console.log(filteredPatients);
+    const progressId = req.params.progressId;
 
+    const progress = await Progress.findById(progressId);
 
+    if (!progress || !progress.report_file) {
+      return res.status(404).json({ error: 'Report file not found' });
+    }
 
+    res.set('Content-Type', progress.report_file.contentType);
+    res.send(progress.report_file.data); 
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch patients' });
+    console.error('Error fetching report file:', error);
+    res.status(500).json({ error: 'Failed to fetch report file' });
   }
 });
-
-//Therapist Matching
+///Therapist Matching
 app.get('/api/therapists-avail', async (req, res) => {
   try {
     let { selectedSchedule, selectedDate } = req.query;
@@ -1008,8 +1084,6 @@ app.get('/api/therapists-avail', async (req, res) => {
   }
 });
 
-
-
 // Route to handle creating new schedules
 app.post('/api/schedules', async (req, res) => {
   try {
@@ -1038,7 +1112,6 @@ app.post('/api/schedules', async (req, res) => {
     }
   }
 });
-
 
 // Catch-all route to serve the index.html for client-side routing (for production)
 app.use((req, res, next) => {

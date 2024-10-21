@@ -1,16 +1,65 @@
+header {
+    background-color: #94C5B5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    height: 80px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    position: fixed;
+    width: 100%;
+    padding: 20px;
+}
+
+.nav-cnt {
+    display: flex;
+    justify-content: center; /* Center horizontally within the navigation container */
+    width: 100%; /* Optional: Ensure the container takes full width */
+  }
+  
+  nav{
+    font-size: 13px;
+    color: white;
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .nav-cnt {
+    display: flex;
+    justify-content: center; /* Center horizontally within the navigation container */
+    width: 100%; /* Optional: Ensure the container takes full width */
+  }
+  
+  h3 {
+    font-size: 25px;
+    color: #3F4662;
+    margin-top: 10px;
+  }
+
+  p {
+    font-size: 20px;
+  }
 .patients-lessons {
     display: flex;
     flex-direction: row;
+    gap: 5px;
 }
 
+.patient-info, .patient-lessons, .remarks, .report-file {
+  border: solid 1px #3F4662;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
 .patient-info {
     background: #F8F2F2;
     margin: 5%;
+    margin-right: 0px;
     margin-bottom: 1%;
-    padding: 30px;
-    border-radius: 30px;
+    padding: 20px;
+    border-radius: 10px;
     align-items: center;
     width: 50%;
+    
 }
 
 .patient-lessons {
@@ -18,14 +67,15 @@
     margin-right: 5%;
     margin-top: 5%;
     margin-bottom: 1%;
-    padding: 30px;
-    border-radius: 30px;
+    padding: 20px;
+    border-radius: 10px;
     width: 50%;
 }
 
 .reports-remarks {
     display: flex;
     flex-direction: row;
+    gap: 5px;
 }
 .remarks {
     background: #F8F2F2;
@@ -33,8 +83,8 @@
     height: 400px;
     margin-top: 0px;
     margin-right: 5%;
-    padding: 30px;
-    border-radius: 30px;
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .report-file {
@@ -43,10 +93,9 @@
     flex-direction: column;
     width: 50%;
     margin-left: 5%;
-    margin-right: 5%;
     margin-top: 0px;
-    padding: 30px;
-    border-radius: 30px;
+    padding: 20px;
+    border-radius: 10px;
     align-items: center;
     text-align: center;
 }
@@ -60,7 +109,7 @@
 }
 
 .report-file button {
-    margin-top: auto; /* Push the button to the bottom */
+    margin-top: auto;
   }
   
 .prev-patient-btn {

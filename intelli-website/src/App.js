@@ -3,7 +3,6 @@ import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import LandingPage from "./pages/Landing";
 import LoginPage from "./pages/LoginForm";
 import SignUpPage from "./pages/SignupForm";
-import VerificationPage from "./VerificationPage";
 import StaffHomePage from "./pages/admin/staffHome";
 import SchedManagerPage from "./pages/admin/ScheduleManager";
 import LessonDetailsPage from './pages/admin/LessonDetails';
@@ -13,8 +12,8 @@ import Sidebar from "./pages/admin/Sidebar";
 import AppointmentPage from "./pages/guardian/Appointments";
 import StaffRegistrationPage from "./pages/SignupStaff";
 import ProgressReport from "./pages/admin/ProgressReport";
-import MonthlyReportPage from "./pages/admin/MonthlyReport"; 
 import PatientProfilesPage from "./pages/admin/Profiles";
+import ChildProgress from './pages/guardian/patientProgress'; 
 
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +21,7 @@ export default function App() {
   const [userRole, setUserRole] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authToken, setAuthToken] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
   useEffect(() => {
@@ -36,7 +36,6 @@ export default function App() {
       setUserRole(null); // Ensure role is reset if not found
       setIsAuthenticated(false);
     }
-
     setIsLoading(false); // Set loading to false after checking localStorage
   }, []);
 
@@ -67,7 +66,6 @@ export default function App() {
         {/* Public Routes (accessible to all users) */}
         <Route index element={<LandingPage />} />
         <Route path="/register" element={<SignUpPage />} />
-        <Route path="/verify/:token" element={<VerificationPage />} /> 
         <Route
           path="/login"
           element={
@@ -105,24 +103,43 @@ export default function App() {
           <Route path="/therapistSchedule" element={<TherapistSchedulePage />} />
           <Route path="/upcomingAppStaff" element={<UpcomingAppStaffPage />} />
           <Route path="/Profiles" element={<PatientProfilesPage />} />
-          <Route path="/MonthlyReport" element={<MonthlyReportPage />} />
         </Route>
 
         {/* Protected Route for Staff Registration (accessible only to admins) */}
         <Route path="/SignupStaff" element={<StaffRegistrationPage />} />
 
-        {/* Protected Route for Guardians */}
-        <Route
-          path="/appointment"
-          element={
-            isGuardianAndLoggedIn() ? (
-              <AppointmentPage />
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
-        />
-      </Routes>
+     {/* Protected Route for Guardians */}
+  <Route
+    path="/homepage"
+    element={
+      isGuardianAndLoggedIn() ? (
+        <guardianHomePage onLogout={handleLogout} />
+      ) : (
+        <Navigate to="/login" replace />
+      )
+    }
+  />
+  <Route
+    path="/appointment"
+    element={
+      isGuardianAndLoggedIn() ? (
+        <AppointmentPage onLogout={handleLogout} />
+      ) : (
+        <Navigate to="/login" replace />
+      )
+    }
+  />
+  <Route
+    path="/progress"
+    element={
+      isGuardianAndLoggedIn() ? (
+        <ChildProgress onLogout={handleLogout} />
+      ) : (
+        <Navigate to="/login" replace />
+      )
+    }
+  />
+</Routes>
     </div>
   );
 }

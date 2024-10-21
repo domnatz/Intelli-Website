@@ -64,10 +64,6 @@ export default function PatientList() {
                     }
                   />
                   <CardContent>
-                    <Typography variant="body2" color="textSecondary">
-                      {/* Replace with the actual therapy type field from your patient data */}
-                      Therapy Type: {/* Replace with the actual therapy type field from your patient data */}
-                    </Typography>
                   </CardContent>
                 </Card>
               </Link>
