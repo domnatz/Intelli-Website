@@ -14,6 +14,7 @@ import StaffRegistrationPage from "./pages/SignupStaff";
 import ProgressReport from "./pages/admin/ProgressReport";
 import PatientProfilesPage from "./pages/admin/Profiles";
 import ChildProgress from './pages/guardian/patientProgress'; 
+import MonthlyReport from './pages/admin/MonthlyReport';
 
 import { useNavigate } from "react-router-dom";
 
@@ -103,6 +104,7 @@ export default function App() {
           <Route path="/therapistSchedule" element={<TherapistSchedulePage />} />
           <Route path="/upcomingAppStaff" element={<UpcomingAppStaffPage />} />
           <Route path="/Profiles" element={<PatientProfilesPage />} />
+          <Route path="/MonthlyReport" element={<MonthlyReport />} />
         </Route>
 
         {/* Protected Route for Staff Registration (accessible only to admins) */}
