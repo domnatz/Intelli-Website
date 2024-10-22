@@ -236,7 +236,12 @@ app.post('/api/login', async (req, res) => {
 
     req.session.userId = user._id; // Store user ID in the session
     console.log(req.session); // Log the session information
-
+    
+// Check if the user has the 'guardian' role and is verified
+if (user.role === 'guardian' && !user.verified) { 
+  console.log("Guardian user not verified:", username);
+  return res.status(401).json({ error: 'Account not verified. Please check your email.' });
+}
     res.json({
       message: 'Login successful!',
       user: {

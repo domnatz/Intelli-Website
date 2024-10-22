@@ -26,7 +26,7 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setError(null);   
+        setError(null);
 
         setIsLoading(true);
 
@@ -36,7 +36,7 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(formData),   
+                body: JSON.stringify(formData),
             });
 
             setIsLoading(false);
@@ -48,7 +48,7 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
                 localStorage.setItem("authToken", data.token);
                 localStorage.setItem("userRole", data.user.role);
                 localStorage.setItem("userId", data.user.id); // Store the userId
-                sessionStorage.setItem('userId', data.user.id);
+                sessionStorage.setItem('userId', data.user.id); 
 
                 setAuthToken(data.token);
                 setUserRole(data.user.role);
@@ -65,21 +65,34 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
                 // Set Snackbar state for success
                 setSnackbarSeverity('success');
                 setSnackbarMessage('Login successful!');
-                setOpenSnackbar(true); 
+                setOpenSnackbar(true);
 
             } else {
                 // More specific error handling
                 if (response.status === 401) {
-                    //   setError("Invalid username or password");
+                    const errorData = await response.json(); // Get error message from response
+
+                    // Check if the error is related to verification
+                    if (errorData.error.includes('Account not verified')) {
+                        setSnackbarSeverity('warning');
+                        setSnackbarMessage(errorData.error); // Use the message from the backend
+                        setOpenSnackbar(true);
+                    } else {
+                        // Handle other 401 errors (like invalid credentials)
+                        setSnackbarSeverity('error');
+                        setSnackbarMessage(errorData.error || 'Invalid username or password');
+                        setOpenSnackbar(true);
+                    }
                 } else {
+                    // Handle other errors
                     const errorData = await response.json();
                     setError(errorData.error || "Failed to log in");
-                }
 
-                // Set Snackbar state for error
-                setSnackbarSeverity('error');
-                setSnackbarMessage(error || 'Invalid username or password'); 
-                setOpenSnackbar(true); 
+                    // Set Snackbar state for error
+                    setSnackbarSeverity('error');
+                    setSnackbarMessage(error || 'Failed to log in');
+                    setOpenSnackbar(true);
+                }
             }
         } catch (error) {
             setIsLoading(false);
@@ -89,7 +102,7 @@ export default function LoginForm({ setUserRole, setAuthToken, setIsAuthenticate
             // Set Snackbar state for network error
             setSnackbarSeverity('error');
             setSnackbarMessage('Network error. Please try again later.');
-            setOpenSnackbar(true); 
+            setOpenSnackbar(true);
         }
     };
 
