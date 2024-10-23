@@ -350,7 +350,16 @@ export default function PatientInfoForm() {
   }, [lessons, patient]);
 
   if (!patient) {
-    return <div>Loading patient data...</div>;
+    return ( 
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh' // Take full viewport height 
+      }}>
+        <CircularProgress /> 
+      </div>
+    );
   }
   const handleDeleteLesson = async (lessonId) => {
     try {

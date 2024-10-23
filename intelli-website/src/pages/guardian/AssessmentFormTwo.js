@@ -90,11 +90,11 @@ const handleSubmit = (event) => {
             backgroundColor: '#FDF3EB',
             border: '2px solid #C6C6C6',
             borderRadius: '10px',
-            maxWidth: '800px',
+            width: '94%',
             margin: 'auto',
           }}
         >
-          <Typography variant="h5" gutterBottom sx={{ fontStyle: 'italic', marginBottom: '20px', color: '#3F4662' }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'Bolder', marginBottom: '20px', color: '#2d848b' }}>
             Occupational Therapy Case History Form (Initial Evaluation)
           </Typography>
     
@@ -243,6 +243,7 @@ const handleSubmit = (event) => {
                 backgroundColor: '#94C5B5',
                 marginBottom: '20px',
                 border: '1px solid black',
+                marginTop: '15px',
               }}
             >
               <Typography variant="h5">School Skills and Participation</Typography>
@@ -544,7 +545,17 @@ const handleSubmit = (event) => {
             marginTop: '20px',
           }}
         >
-          <Button type="submit" variant="contained" color="primary" sx={{ backgroundColor: '#42a5f5', borderRadius: '50px' }}>
+          <Button type="submit" variant="contained" color="primary" 
+          sx={{ 
+            backgroundColor: '#2D848B', 
+            borderRadius: '20px', 
+            width: '140px', 
+            height: '40px', 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            fontWeight: 'bold'
+           }}>
             Continue
           </Button>
         </Box>

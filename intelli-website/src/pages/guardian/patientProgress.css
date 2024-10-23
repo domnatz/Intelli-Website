@@ -40,6 +40,10 @@ header {
   p {
     font-size: 20px;
   }
+
+  .patient-info-container {
+    margin-top: 0%;
+  }
 .patients-lessons {
     display: flex;
     flex-direction: row;
@@ -47,14 +51,22 @@ header {
 }
 
 .patient-info, .patient-lessons, .remarks, .report-file {
-  border: solid 1px #3F4662;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+.title-heading {
+  margin-top: 110px;
+  color: #2d848b;
+  font-weight: bolder;
+  font-size: 40px;
+  text-align: center;
+}
+
 .patient-info {
     background: #F8F2F2;
-    margin: 5%;
     margin-right: 0px;
     margin-bottom: 1%;
+    margin-left: 5%;
     padding: 20px;
     border-radius: 10px;
     align-items: center;
@@ -65,7 +77,6 @@ header {
 .patient-lessons {
     background: #F8F2F2;
     margin-right: 5%;
-    margin-top: 5%;
     margin-bottom: 1%;
     padding: 20px;
     border-radius: 10px;

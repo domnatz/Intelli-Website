@@ -23,9 +23,6 @@ export default function StaffHome({ userRole, onLogout }) {
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  padding: "10px 20px",
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
                   mr: 2, // Add margin-right between links
                 }}
               >
@@ -40,9 +37,6 @@ export default function StaffHome({ userRole, onLogout }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "10px 20px",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
               }}
             >
               <Typography variant="p">Logout</Typography>

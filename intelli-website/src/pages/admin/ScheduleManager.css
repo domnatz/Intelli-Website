@@ -1,21 +1,26 @@
 .schedule-manager-layout {
     display: flex;
-    align-items: flex-start;
+    height: 100vh; /* Ensures full height of the viewport */
+    background-color: #F7EEDD; /* Optional background color */
 }
 
 .schedule-manager-content {
-    margin-left: 280px; 
+    margin-left: 80px;
     padding: 20px;
-    width: calc(100% - 280px);
+    width: 90%;
+    
+
+   
 }
 
 .schedule-manager-title {
-    position: absolute;
-    top: -43px;
-   left: 300px; 
-    font-size: 32px;
-    font-weight: bold;
-    color: #3F4662;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    color: #2d848b;
+    font-weight: bolder;
+    font-size: 40px;
+    margin-left: 150px;
+    
 }
 
 .schedule-manager-container {
@@ -26,8 +31,9 @@
     max-width: 100%;
     overflow-x: auto;
     border: 1px solid #3F4662;
-    margin-top: 80px;
     height: 460px;
+    margin-left: 220px;
+    
 }
 
 .schedule-manager-table {
@@ -58,8 +64,25 @@
     align-items: center; 
     font-size: 20px;
     color: #3F4662;
+    margin-top: 50px;
 
 }
+
+.assign1-button-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically (if needed) */
+    margin-top: 50px; /* Optional: Add some space above */
+    height: 100px; /* Optional: Control the height of the container */
+  }
+
+  .assign2-button-container {
+    display: flex;
+    justify-content: right; /* Center horizontally */
+    align-items: right; /* Center vertically (if needed) */
+    margin-top: 50px; /* Optional: Add some space above */
+    height: 100px; /* Optional: Control the height of the container */
+  }
 
 .date{
     display: grid;
@@ -101,7 +124,7 @@
 
 .assign {
     width: 180px !important;
-    padding: 0.25rem !important;
+    padding: 0.43rem !important;
     background-color: #2D848B !important;
     color: #fff !important;
     border: none !important;

@@ -11,15 +11,18 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import TextField from '@mui/material/TextField';   
-
+import TextField from '@mui/material/TextField'; 
+import Alert from '@mui/material/Alert';
+import {
+  Grid,
+} from '@mui/material';
 
 // Import date-pickers components
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';   
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';   
 
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';   
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';   
 
 
 // Import dayjs for date handling
@@ -44,6 +47,7 @@ const modalStyle = {
 export default function ScheduleManager() {
   const [therapists, setTherapists] = useState([]);
   const [selectedTherapist, setSelectedTherapist] = useState('');
+  const [deleteTherapist, setDeleteTherapist] = useState('');
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [selectedStartTime, setSelectedStartTime] = useState('');
   const [selectedEndTime, setSelectedEndTime] = useState('');
@@ -51,7 +55,8 @@ export default function ScheduleManager() {
   const [successMessage, setSuccessMessage] = useState(null);
 
   // Modal state
-  const [open, setOpen] = useState(false);
+  const [addTherapistOpen, setAddOpen] = useState(false);
+  const [deleteTherapistOpen, setDeleteOpen] = useState(false);
   const [newTherapistName, setNewTherapistName] = useState('');
   const [newSpecialization, setNewSpecialization] = useState('');
   const [newGender, setNewGender] = useState('');
@@ -84,6 +89,7 @@ const scheduleMapping = {
 
   const handleTherapistChange = (event) => {
     setSelectedTherapist(event.target.value);
+    setDeleteTherapist(event.target.value);
   };
 
   const handleDateChange = (newDate) => {
@@ -107,9 +113,9 @@ const scheduleMapping = {
     setSelectedEndTime(event.target.value);
   };
 
-  const handleSubmit   
+  const handleSubmit   
  = async (event) => {
-    event.preventDefault();   
+    event.preventDefault();   
 
 
     // Clear any previous error or success messages
@@ -128,6 +134,11 @@ const scheduleMapping = {
       return;
     }
 
+    if (!deleteTherapist) {
+      setError('Please select a therapist.');
+      return;
+    }
+    
     // Prepare schedule data 
     const scheduleData = {
       therapist_id: selectedTherapist, 
@@ -163,6 +174,8 @@ const scheduleMapping = {
         setSelectedDate(dayjs());
         setSelectedStartTime('');
         setSelectedEndTime('');
+        setDeleteTherapist('');
+
       } else {
         // Enhanced error handling
         try {
@@ -184,11 +197,12 @@ const scheduleMapping = {
     }
   };
   
-  // Function to handle opening the modal for adding a new therapist
-  const handleModalOpen = () => setOpen(true);
-
+  // Function to handle opening the modal
+  const handleAddModalOpen = () => setAddOpen(true);
+  const handleDeleteModalOpen = () => setDeleteOpen(true);
   // Function to handle closing the modal
-  const handleModalClose = () => setOpen(false);
+  const handleAddModalClose = () => setAddOpen(false);
+  const handleDeleteModalClose = () => setDeleteOpen(false);
 
   // Function to handle adding a new therapist
   const handleAddTherapist = async (event) => {
@@ -219,7 +233,7 @@ const scheduleMapping = {
         setNewTherapistName('');
         setNewSpecialization('');
         setNewGender('');
-        handleModalClose();
+        handleAddModalClose();
 
         alert('Therapist added successfully!');
       } else {
@@ -241,13 +255,18 @@ const scheduleMapping = {
     }
   };
 
-  const handleDeleteTherapist = async (therapistId) => {
+  const handleDeleteTherapist = async (event) => {
+    event.preventDefault();
+    
+    const therapistId = deleteTherapist;
+
     if (
       window.confirm(
         "Are you sure you want to delete this therapist? This action cannot be undone."
       )
     ) {
       try {
+        
         const response = await fetch(
           `${process.env.REACT_BACKEND_API}/api/therapists/${therapistId}`,
           {
@@ -282,19 +301,35 @@ const scheduleMapping = {
       <div className="schedule-manager-content">
         <h6 className="schedule-manager-title">Manage Therapist Schedule</h6>
 
-        {/* Display error message if there's an error */}
-        {error && <div className="error-message">{error}</div>} 
-
         <div className="schedule-manager-container">
-          <Button variant="contained" color="primary" onClick={handleModalOpen} sx={{
+          <Button variant="contained" color="primary" onClick={handleAddModalOpen} sx={{
             backgroundColor: '#2D848B',
-            borderRadius: '18px',
+            marginLeft: '10px',
+            borderRadius: '15px',
+            marginBottom: '5px',
             fontSize: '18px',
+            width: '250px',
             fontWeight: 'bold',
             '&:hover': { backgroundColor: '#94C5B5' }
           }}>
             Add Therapist
           </Button>
+
+          <Button 
+            variant="contained"
+            onClick={handleDeleteModalOpen}
+            sx={{ 
+                backgroundColor: '#E53935',
+                borderRadius: '15px',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                marginLeft: '10px',
+                width: '250px',
+                '&:hover': { backgroundColor: '#D32F2F' }
+          }}>
+            Delete Therapist
+          </Button>
+
           <h4 className='therapist'>Therapist</h4>
           <Box sx={{ width: 410, borderColor: '#3F4662', marginBottom: 3, marginLeft: 4 }}>
             <FormControl fullWidth>
@@ -321,7 +356,7 @@ const scheduleMapping = {
           </Box>
 
           <h4 className='date'> Date </h4>
-          <Box sx={{ maxWidth: 200, borderColor: '#3F4662', marginTop: -8, marginLeft: 60 }}>
+          <Box sx={{ width: 300, borderColor: '#3F4662', marginTop: -8, marginLeft: 60 }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={['DatePicker']}>
                 <DatePicker
@@ -371,30 +406,23 @@ const scheduleMapping = {
           </Box>
 
            {/* Delete button next to the Select */}
-           <Button 
-    variant="contained" 
-    color="error" // Use color="error" for red
-    onClick={() => handleDeleteTherapist(selectedTherapist)} 
-    disabled={!selectedTherapist} 
-    sx={{ 
-        backgroundColor: '#D14D4D', // Red background color
-        borderRadius: '18px',
-        fontSize: '12px',
-        fontWeight: 'bold',
-        marginLeft: '10px',
-        marginTop: '10px',
-        '&:hover': { backgroundColor: '#E79E9E' } // Lighter red on hover
-    }}
->
-    Delete Therapist
-</Button>
-
-          <button type="submit" className="assign" onClick={handleSubmit}>Assign</button>
+           <div className="assign1-button-container">
+           <Button variant="contained" color="primary" onClick={handleSubmit} sx={{
+            backgroundColor: '#2D848B',
+            borderRadius: '15px',
+            fontSize: '18px',
+            width: '200px',
+            fontWeight: 'bold',
+            '&:hover': { backgroundColor: '#94C5B5' }
+          }}>
+            Assign
+          </Button>
+          </div>
 
           {/* Modal */}
           <Modal
-            open={open}
-            onClose={handleModalClose}
+            open={addTherapistOpen}
+            onClose={handleAddModalClose}
             aria-labelledby="modal-title"
             aria-describedby="modal-description"
           >
@@ -409,6 +437,7 @@ const scheduleMapping = {
                   margin="normal"
                   value={newTherapistName}
                   onChange={(e) => setNewTherapistName(e.target.value)}
+                  required
                 />
                 <TextField
                   label="Specialization"
@@ -416,6 +445,7 @@ const scheduleMapping = {
                   margin="normal"
                   value={newSpecialization}
                   onChange={(e) => setNewSpecialization(e.target.value)}
+                  required
                 />
                 <FormControl fullWidth margin="normal">
                   <InputLabel id="gender-label">Gender</InputLabel>
@@ -424,6 +454,7 @@ const scheduleMapping = {
                     value={newGender}
                     onChange={(e) => setNewGender(e.target.value)}
                     label="Gender"
+                    required
                   >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
@@ -443,6 +474,64 @@ const scheduleMapping = {
               </form>
             </Box>
           </Modal>
+
+          <Modal
+            open={deleteTherapistOpen}
+            onClose={handleDeleteModalClose}
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
+          >
+            <Box sx={modalStyle}>
+              <Typography id="modal-title" variant="h6" component="h2">
+                Delete Existing Therapist
+              </Typography>
+              <form onSubmit={handleDeleteTherapist}>
+              <Box sx={{ width: 410, borderColor: '#3F4662', marginBottom: 3 }}>
+                  <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Select Therapist</InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      id="demo-simple-select"
+                      value={deleteTherapist}
+                      label="Select Therapist"
+                      onChange={handleTherapistChange}
+                    >
+                      {/* Check if therapists data is available before rendering MenuItems */}
+                      {therapists.length > 0 ? (
+                      therapists.map(therapist => (
+                      <MenuItem key={therapist._id} value={therapist._id}>
+                        {therapist.therapist_name}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>Loading therapists...</MenuItem>
+                  )}
+                  </Select>
+                </FormControl>
+              </Box>
+                <Button type="submit" variant="contained" color="primary" sx={{
+                  color:"error",
+                  backgroundColor: '#2D848B',
+                  borderRadius: '18px',
+                  fontSize: '18px',
+                  fontWeight: 'bold',
+                  marginLeft: '110px',
+                  '&:hover': { backgroundColor: '#94C5B5' }
+                }}
+                  disabled={!deleteTherapist}>
+                  Delete Therapist
+                </Button>
+              </form>
+            </Box>
+          </Modal>
+          {error && ( // Conditionally render the Alert for errors
+            <Alert severity="error">{error}</Alert> 
+          )}
+
+          {successMessage && ( // Conditionally render the Alert for success
+            <Alert severity="success">{successMessage}</Alert> 
+          )}
+
         </div>
       </div>
     </div>

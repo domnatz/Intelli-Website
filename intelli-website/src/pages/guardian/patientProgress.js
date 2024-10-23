@@ -1,9 +1,23 @@
-import React, { useState, useEffect } from "react";
-import "./patientProgress.css";
-import { Link } from "react-router-dom";
-import Alert from "@mui/material/Alert";
+import MenuIcon from '@mui/icons-material/Menu';
+import React, { useState, useEffect } from 'react';
+import './patientProgress.css'; 
+import { Link } from 'react-router-dom';
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton'; 
 
-import logo from "../../images/logo.png";
+import {
+  AppBar,
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Toolbar,
+  Typography,
+} from '@mui/material'; 
+
+import logo from '../../images/logo.png';
 
 export default function ChildProgress({ isLoggedIn, onLogout }) {
   const [patients, setPatients] = useState([]);
@@ -12,6 +26,7 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
   const [error, setError] = useState(null);
   const [currentPatient, setCurrentPatient] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [drawerOpen, setDrawerOpen] = useState(false); 
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -212,111 +227,163 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
   }, [currentPatient, patients]);
 
   return (
-    <div className="Patient-pg-cnt">
-      <header>
-        <img className="Logo" src={logo} alt="Logo" />
+         <div className="Patient-pg-cnt">
+          <div  className="Patient-pg-cnt"> {/*New*/}
+      <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000 }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center',  xs: 'none' }}>
+            <img className="Logo" src={logo} alt="Logo" style={{ marginRight: 'px', width: '70px', height: '60px' }} />
+        <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '100px' }}>
+            <nav>
+                <li className="navbar-link" ><a href="/">Home</a></li>
+                <li className="navbar-link"><a href="/appointment">Appointment</a></li>
+                <li className="navbar-link">Child's Progress</li>
+            </nav>
+            
+          </Box>
 
-        <div className="nav-cnt">
-          <nav>
-            <li className="apt-list">
-              <Link to="/" className="guardianHome">
-                Home
-              </Link>
-            </li>
-            <li className="apt-list">
-              <Link to="/appointment" className="AppointmentsPage">
-                Appointment
-              </Link>
-            </li>
-          </nav>
-        </div>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
 
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
-      </header>
+          </Box>
 
-      <main>
-        <div className="patients-info-container">
-          {isLoading && <div className="loading-indicator">Loading...</div>}
-          {!isLoading && !error && (
-            <div className="patients-info">
-              {patients.length > 0 && (
+          <IconButton
+        color="inherit"
+        edge="end"
+        onClick={() => toggleDrawer(true)}
+        sx={{ display: { xs: 'block', md: 'none' }, 
+          ml: 2,
+          '&.MuiIconButton-root': { 
+            minWidth: 0,
+            minHeight: 0,
+            padding: '0px',
+            boxShadow: 'none',
+            '& .MuiSvgIcon-root': { padding: '0px'}
+          } 
+        }}
+      >
+            <MenuIcon />
+          </IconButton>
+
+        </Toolbar>
+      
+
+        <Drawer
+  className="Nav-bar-drawer"
+  anchor="right"
+  open={drawerOpen}
+  onClose={() => toggleDrawer(false)}
+  PaperProps={{
+    sx: {
+      zIndex: 1301, // Ensure the drawer is above the AppBar
+    },
+  }}
+>
+  <List sx={{ width: 250,  }}>
+    <ListItem>
+      <a href="/">
+      <ListItemText
+        primary="Home"
+        primaryTypographyProps={{ fontWeight: 'bold', color: 'white', fontSize: '18px'}}
+      />
+      </a>
+    </ListItem>
+
+    <ListItem>
+      <a href="/appointment">
+      <ListItemText
+        primary="Appointment"
+        primaryTypographyProps={{ fontWeight: 'bold', color: 'white', fontSize: '18px' }}
+      />
+      </a>
+    </ListItem>
+
+    <ListItem>
+      <ListItemText
+        primary="Child's Progress"
+        primaryTypographyProps={{ fontWeight: 'bold', color: 'white', fontSize: '18px' }}
+      />
+    </ListItem>
+  </List>
+
+    <div className="Nav-bar-drawer-footer">
+      <p>&copy; IntelliSpeech Therapy Center</p>
+    </div>
+    </Drawer>
+      </AppBar>
+    </div> {/*New*/}
+
+          <main>  
+          
+          <div className="title-heading"> Child's Progress Report </div> {/*New*/}
+            <div className="patients-info-container">
+
+              {isLoading && <div className="loading-indicator">Loading...</div>}
+              {!isLoading && !error && (
+                <div className="patients-info">
+                {patients.length > 0 && (
                 <div className="patient" key={patients[currentPatient]._id}>
                   <div className="patients-lessons">
                     <div className="patient-info">
                       <h3>Patient Information</h3>
-                      <p>Patient Name: {patients[currentPatient].patient_name}</p>
-                      <p>Age: {patients[currentPatient].patient_age}</p>
-                      <p>Gender: {patients[currentPatient].patient_sex}</p>
+                      <p> Patient Name: {patients[currentPatient].patient_name}</p>
+                      <p> Age: {patients[currentPatient].patient_age}</p>
+                      <p> Gender: {patients[currentPatient].patient_sex}</p>  
                     </div>
 
                     <div className="patient-lessons">
-                      <h3>Current Lessons</h3>
-                      {lessons.length > 0 ? ( // Check if there are any lessons
-                        lessons.map((lesson) => (
-                          <div key={lesson._id}>
-                            <p>Lesson Name: {lesson.lesson_name}</p>
-                            <p>Complexity: {lesson.lesson_complexity}</p>
-                            <p>Category: {lesson.lesson_category}</p>
-                            <p>Description: {lesson.lesson_desc}</p>
-                          </div>
-                        ))
-                      ) : (
-                        <p>No lessons assigned to this patient yet.</p>
-                      )}
+                      <h3>Current Lessons </h3>
+                      {lessons.map((lesson) => ( 
+                        <div key={lesson._id}> 
+                          <p>Lesson Name: {lesson.lesson_name}</p>
+                          <p>Complexity: {lesson.complexity}</p>
+                          <p>Category: {lesson.category}</p>
+                          <p>Description: {lesson.description}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
                   <div className="reports-remarks">
-                  <div className="report-file">
-    {progressReports.map((progress) => (
-      <div key={progress._id}>
-        <p>Report File: {progress.report_file.filename}</p>
-        <button onClick={() => handleDownloadReport(patients[currentPatient]._id, progress._id)}>
-          Download Report
-        </button>
-      </div>
-    ))}
-  </div>
+                    <div className="report-file">
+                    <p> Report File </p>
+                      <button>Show Full Report</button>
+                    </div>
 
                     <div className="remarks">
-                      <h3>Remarks from the Therapist:</h3>
-                      {progressReports.map((progress) => (
-                        <p key={progress._id}>{progress.remarks}</p>
-                      ))}
+                        <h3> Remarks from the Therapist: </h3>
+                        {progressReports.map((progress) => ( 
+                          <p>{progress.remarks}</p> 
+                        ))}
                     </div>
                   </div>
 
                   <div className="patient-navigation">
                     <div className="button-wrapper">
-                      {currentPatient > 0 && (
-                        <button
-                          className="prev-patient-btn"
-                          onClick={handlePrevPatient}
-                        >
-                          Previous
-                        </button>
-                      )}
+                    {currentPatient > 0 && ( // Conditionally render "Previous" button
+                      <button className="prev-patient-btn" onClick={handlePrevPatient}>
+                        Previous
+                      </button>
+                    )}
                     </div>
                     <div className="button-wrapper">
-                      {currentPatient < patients.length - 1 && (
-                        <button
-                          className="next-patient-btn"
-                          onClick={handleNextPatient}
-                        >
-                          Next
-                        </button>
-                      )}
+                    {currentPatient < patients.length - 1 && ( // Conditionally render "Next" button
+                      <button className="next-patient-btn" onClick={handleNextPatient}>
+                        Next
+                      </button>
+                    )}
                     </div>
                   </div>
                 </div>
               )}
+              </div>
+            )}
+            {error && (
+              <Alert severity="error">{error}</Alert> 
+            )}
             </div>
-          )}
-          {error && <Alert severity="error">{error}</Alert>}
+          </main>
         </div>
-      </main>
-    </div>
-  );
-}
+    );
+  }

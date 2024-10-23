@@ -30,13 +30,14 @@ body {
     margin-top: 100px;
 }
 
+
 .staff-home-links {
     display: flex;
     justify-content: flex-end;
     position: absolute;
     top: 20px;
     right: 20px;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color:#2D848B;;
     padding: 10px 20px; 
     border-radius: 5px;
     gap: 10px; /* Adjust spacing between links */

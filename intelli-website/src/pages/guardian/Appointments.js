@@ -9,7 +9,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import TextField from '@mui/material/TextField';   
- 
+import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
 
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -18,6 +18,18 @@ import PersonIcon from '@mui/icons-material/Person';
 import { styled } from '@mui/material/styles';
 
 import logo from '../../images/logo.png';
+
+import {
+  AppBar,
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Toolbar,
+  Typography,
+} from '@mui/material'; {/*New*/}
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
@@ -36,8 +48,7 @@ const CustomAccordion = styled(Accordion)({
   '@media (max-width: 600px)': {
     borderRadius: '10px', // Smaller border radius on phones
   }
-});
-
+}); {/*New*/}
 
 export default function Appointments({ therapyType, isLoggedIn, onLogout  }) { // Destructure therapyType from props
   const [activeForm, setActiveForm] = useState(null);
@@ -49,6 +60,7 @@ export default function Appointments({ therapyType, isLoggedIn, onLogout  }) { /
   const [selectedSchedule, setSelectedSchedule] = useState(null); 
   const [assessmentData, setAssessmentData] = useState(null);
   const [error, setError] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   // ... other imports and state declarations
   const handleDateChange = (date) => {
     // Convert the date to a Dayjs object if it's not already
@@ -112,6 +124,10 @@ const handleAccordionChange = (panel) => (event, isExpanded) => {
 
 const handleNextAccordion = (nextPanel) => {
     setExpanded(nextPanel);
+};
+
+const toggleDrawer = (open) => {
+  setDrawerOpen(open);
 };
 
 const handleFormSubmit = (formData) => {
@@ -266,181 +282,249 @@ const submitAssessmentData = async (patientData) => {
     handleNextAccordion('panel5'); // Move to the confirmation panel
 };
 
+return (
+  <div className="Appointment-pg-cnt">
+   <div  className="Appointment-pg-cnt"> {/*New*/}
+    <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000 }}>
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <img className="Logo" src={logo} alt="Logo" style={{ marginRight: 'px', width: '70px', height: '60px' }} />
+      <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '100px' }}>
+          <nav>
+              <li className="navbar-link" ><a href="/">Home</a></li>
+              <li className="navbar-link">Appointment</li>
+              <li className="navbar-link"><a href="/progress">Child's Progress</a></li>
+          </nav>
+          
+        </Box>
 
-  return (
-    <div className="Appointment-pg-cnt">
-      <header>
-        <img className="Logo" src={logo} alt="Logo" />
+        <button className="logout-btn" >
+          Logout
+        </button>
 
-        <nav>
-          <li className="apt-list">
-            <Link to="/" className="guardianHome">
-              Home
-            </Link>
-          </li>
-          <li className="apt-list"> {/* Added */}
-            <Link to="/progress" className="patientProgress">
-              Child's Progress
-            </Link>
-          </li>
-        </nav>
+        </Box>
 
-        {isLoggedIn && ( // Conditionally render logout button
-          <button className="logout-btn" onClick={onLogout}>
-            Logout
-          </button>
-        )} 
-      </header>
+        <IconButton
+      color="inherit"
+      edge="end"
+      onClick={() => toggleDrawer(true)}
+      sx={{ display: { xs: 'block', md: 'none' }, 
+        ml: 2,
+        '&.MuiIconButton-root': { 
+          minWidth: 0,
+          minHeight: 0,
+          padding: '0px',
+          boxShadow: 'none',
+          '& .MuiSvgIcon-root': { 
+            padding: '0px'
+          }
+        }
+      }}
+      
+    >
+          <MenuIcon />
+        </IconButton>
 
-      <main>
-        <h1 style={{ marginTop: 0, paddingTop: 70 }}> Schedule Your Appointment Today </h1>
-
-        <div className="Accordion-grp">
-          <CustomAccordion expanded={expanded === 'panel1'} onChange={() => setExpanded(expanded === 'panel1' ? null : 'panel1')}>
-            <AccordionSummary
-              expandIcon={<ArrowDropDownIcon />}
-              aria-controls="pnl1-cnt"
-              className="pnl1-head">
-
-              <h2> Choose Appointment </h2>
-            </AccordionSummary>
-            <AccordionDetails>
-              <div className="SLPBook">
-                <div className="book-cnt">
-                  <h3>Speech Language Pathology</h3>
-                  <p>
-                    Specialist in the evaluation, diagnosis, treatment, and prevention of communication disorders
-                    (speech and language impairments), cognitive-communication disorders, voice disorder across
-                    the lifespan.
-                  </p>
-
-                  <p>
-                    Assessment - Php 2, 500 <br />
-                    Therapy - PHP 700
-                  </p>
-                </div>
-                <div className="btn-container"> <button className="book-btn" onClick={() => handleSelectFormAndExpandAccordion('form1', 'panel2')}> Book </button>
-                </div>
-              </div>
-
-              <div className="OTBook">
-                <div className="book-cnt">
-                  <h3>Occupational Therapy</h3>
-                  <p>
-                    Involves the therapeutic use of everyday activities, or occupations, to treat the physical, mental,
-                    developmental. and emotional ailments that impact patient's ability to perform daily tasks.
-                  </p>
-
-                  <p>
-                    Assessment - Php 2, 500 <br />
-                    Therapy - PHP 700
-                  </p>
-                </div>
-                <div className="btn-container">
-                  <button className="book-btn" onClick={() => handleSelectFormAndExpandAccordion('form2', 'panel2')}> Book </button>
-                </div>
-              </div>
-            </AccordionDetails>
-          </CustomAccordion>
-
-          <CustomAccordion expanded={expanded === 'panel2'} onChange={handleAccordionChange('panel2')}>
-            <AccordionSummary
-              expandIcon={<ArrowDropDownIcon />}
-              aria-controls="pnl2-cnt"
-              className="pnl2-head">
-
-              <h2> Choose Time and Date </h2>
-            </AccordionSummary>
-            <AccordionDetails>
-              <div className="chooseTimeDate">
-                <div className="chooseDate">
-                  <h2> Date </h2>
-                  <TextField
-                    type="date"
-                    fullWidth
-                    variant="outlined"
-                    onChange={(e) => handleDateChange(e.target.value)}
-                    sx={{
-                      backgroundColor: '#FFFFFF',
-                      borderRadius: '20px',
-                      '& .MuiOutlinedInput-root': { borderRadius: '20px' },
-                    }}
-                  />
-                </div>
-
-                <div className="chooseTime">
-                  <h2> Time Available </h2>
-                  <div className="Times">
-  <button
-    className={`Time ${selectedTime === '08:00-10:00' ? 'selected' : ''}`}
-    onClick={() => handleTimeSelection('08:00-10:00')} 
-  >
-    8:00 - 10:00 
-  </button>
-  <button
-    className={`Time ${selectedTime === '10:00-12:00' ? 'selected' : ''}`}
-    onClick={() => handleTimeSelection('10:00-12:00')}
-  >
-    10:00 - 12:00 
-  </button>
-  <button
-    className={`Time ${selectedTime === '13:00-15:00' ? 'selected' : ''}`}
-    onClick={() => handleTimeSelection('13:00-15:00')}
-  >
-    1:00 - 3:00 
-  </button>
-  <button
-    className={`Time ${selectedTime === '15:00-17:00' ? 'selected' : ''}`}
-    onClick={() => handleTimeSelection('15:00-17:00')}
-  >
-    3:00 - 5:00
-  </button>
-</div>
-                </div>
-              </div>
-
-              <div className="continue-cnt">
-                <button className="continue-btn" onClick={() => handleNextAccordion('panel3')}>Continue</button>
-              </div>
-            </AccordionDetails>
-          </CustomAccordion>
-
-          <CustomAccordion expanded={expanded === 'panel3'} onChange={handleAccordionChange('panel3')}>
-            <AccordionSummary
-              expandIcon={<ArrowDropDownIcon />}
-              aria-controls="pnl3-cnt"
-              className="pnl3-head">
-
-              <h2> Patient Information </h2>
-            </AccordionSummary>
-            <AccordionDetails>
-              {activeForm === 'form1' && (
-                <FormOne onSubmit={handleFormSubmit} /> 
-              )}
-        
-              {activeForm === 'form2' && (<FormTwo onSubmit={handleFormSubmit} />)}
-            </AccordionDetails>
-          </CustomAccordion>
-
+      </Toolbar>
     
-        <CustomAccordion expanded={expanded === 'panel5'} onChange={handleAccordionChange('panel5')}>
+
+      <Drawer
+        className="Nav-bar-drawer"
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => toggleDrawer(false)}
+        PaperProps={{
+          sx: {
+            zIndex: 1301, // Ensure the drawer is above the AppBar
+          },
+        }}
+      >
+
+<List sx={{ width: 250,  }}>
+  <ListItem>
+    <a href="/">
+    <ListItemText
+      primary="Home"
+      primaryTypographyProps={{ fontWeight: 'bold', color: 'white', fontSize: '18px'}}
+    />
+    </a>
+  </ListItem>
+
+  <ListItem>
+    <ListItemText
+      primary="Appointment"
+      primaryTypographyProps={{ fontWeight: 'bold', color: 'white', fontSize: '18px' }}
+    />
+  </ListItem>
+
+  <ListItem>
+    <a href="/progress">
+    <ListItemText
+      primary="Child's Progress"
+      primaryTypographyProps={{ fontWeight: 'bold', color: 'white', fontSize: '18px' }}
+    />
+    </a>
+  </ListItem>
+</List>
+
+  <div className="Nav-bar-drawer-footer">
+    <p>&copy; IntelliSpeech Therapy Center</p>
+  </div>
+  </Drawer>
+    </AppBar>
+  </div> {/*New*/}
+
+    <main>
+      <h1 className="title-heading"> Schedule Your Appointment Today </h1> {/*New*/}
+
+      <div className="Accordion-grp">
+        <CustomAccordion expanded={expanded === 'panel1'} onChange={() => setExpanded(expanded === 'panel1' ? null : 'panel1')}>
           <AccordionSummary
             expandIcon={<ArrowDropDownIcon />}
-            aria-controls="pnl5-cnt"
-            className="pnl5-head">
+            aria-controls="pnl1-cnt"
+            className="pnl1-head">
 
-            <h2> Confirmation </h2>
+            <h2> Choose Appointment </h2>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="ConfirmInfo">
-              <p>Are you sure you want to confirm this appointment?</p> 
+            <div className="SLPBook">
+              <div className="book-cnt">
+                <h3 className='choose-lbl'>Speech Language Pathology</h3>
+                
+                <p>
+                  Specialist in the evaluation, diagnosis, treatment, and prevention of communication disorders
+                  (speech and language impairments), cognitive-communication disorders, voice disorder across
+                  the lifespan.
+                </p>
 
-              <button onClick={handleSubmitAppointment}>Confirm Appointment</button> 
+                <p>
+                  Assessment - Php 2, 500 <br />
+                  Therapy - PHP 700
+                </p>
+              </div>
+              <div className="btn-container"> <button className="book-btn" onClick={() => handleSelectFormAndExpandAccordion('form1', 'panel2')}> Book </button>
+              </div>
+            </div>
+
+            <div className="OTBook">
+              <div className="book-cnt">
+                <h3 className='choose-lbl' >Occupational Therapy</h3>
+
+                <p>
+                  Involves the therapeutic use of everyday activities, or occupations, to treat the physical, mental,
+                  developmental. and emotional ailments that impact patient's ability to perform daily tasks.
+                </p>
+
+                <p>
+                  Assessment - Php 2, 500 <br />
+                  Therapy - PHP 700
+                </p>
+              </div>
+              <div className="btn-container">
+                <button className="book-btn" onClick={() => handleSelectFormAndExpandAccordion('form2', 'panel2')}> Book </button>
+              </div>
             </div>
           </AccordionDetails>
         </CustomAccordion>
-      </div>
-    </main>
-  </div>
+
+        <CustomAccordion expanded={expanded === 'panel2'} onChange={handleAccordionChange('panel2')}>
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="pnl2-cnt"
+            className="pnl2-head">
+
+            <h2> Choose Time and Date </h2>
+          </AccordionSummary>
+          <AccordionDetails>
+            <div className="chooseTimeDate">
+              <div className="chooseDate">
+                <h2> Date </h2>
+                <TextField
+                  type="date"
+                  fullWidth
+                  variant="outlined"
+                  onChange={(e) => handleDateChange(e.target.value)}
+                  sx={{
+                    backgroundColor: '#FFFFFF',
+                    borderRadius: '20px',
+                    '& .MuiOutlinedInput-root': { borderRadius: '20px' },
+                  }}
+                />
+              </div>
+
+              <div className="chooseTime">
+                <h2> Time Available </h2>
+                <div className="Times">
+<button
+  className={`Time ${selectedTime === '08:00-10:00' ? 'selected' : ''}`}
+  onClick={() => handleTimeSelection('08:00-10:00')} 
+>
+  8:00 - 10:00 
+</button>
+<button
+  className={`Time ${selectedTime === '10:00-12:00' ? 'selected' : ''}`}
+  onClick={() => handleTimeSelection('10:00-12:00')}
+>
+  10:00 - 12:00 
+</button>
+<button
+  className={`Time ${selectedTime === '13:00-15:00' ? 'selected' : ''}`}
+  onClick={() => handleTimeSelection('13:00-15:00')}
+>
+  1:00 - 3:00 
+</button>
+<button
+  className={`Time ${selectedTime === '15:00-17:00' ? 'selected' : ''}`}
+  onClick={() => handleTimeSelection('15:00-17:00')}
+>
+  3:00 - 5:00
+</button>
+</div>
+              </div>
+            </div>
+
+            <div className="continue-cnt">
+              <button className="continue-btn" onClick={() => handleNextAccordion('panel3')}>Continue</button>
+            </div>
+          </AccordionDetails>
+        </CustomAccordion>
+
+        <CustomAccordion expanded={expanded === 'panel3'} onChange={handleAccordionChange('panel3')}>
+          <AccordionSummary
+            expandIcon={<ArrowDropDownIcon />}
+            aria-controls="pnl3-cnt"
+            className="pnl3-head">
+
+            <h2> Patient Information </h2>
+          </AccordionSummary>
+          <AccordionDetails>
+            {activeForm === 'form1' && (
+              <FormOne onSubmit={handleFormSubmit} /> 
+            )}
+      
+            {activeForm === 'form2' && (<FormTwo onSubmit={handleFormSubmit} />)}
+          </AccordionDetails>
+        </CustomAccordion>
+
+  
+      <CustomAccordion expanded={expanded === 'panel5'} onChange={handleAccordionChange('panel5')}>
+        <AccordionSummary
+          expandIcon={<ArrowDropDownIcon />}
+          aria-controls="pnl5-cnt"
+          className="pnl5-head">
+
+          <h2> Confirmation </h2>
+        </AccordionSummary>
+        <AccordionDetails>
+          <div>
+          <h3 className="ConfirmInfo">Are you sure you want to confirm this appointment?</h3> {/*New*/}
+
+            <button onClick={handleSubmitAppointment} className="Confirm-btn">Confirm Appointment</button> {/*New*/}
+          </div>
+        </AccordionDetails>
+      </CustomAccordion>
+    </div>
+  </main>
+</div>
 );
 }
