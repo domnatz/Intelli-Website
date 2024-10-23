@@ -2,12 +2,15 @@
 
 .signup-container {
   display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 110vh;
-    background-color: #94C5B5;
-    position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full screen height */
+  background-color: #94C5B5;
+  position: relative;
+  margin: 0; /* Ensures no margin from parent elements */
 }
+
 
 
 .signup-box {
