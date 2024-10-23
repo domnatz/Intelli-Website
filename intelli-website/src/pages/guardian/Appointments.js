@@ -11,7 +11,8 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import TextField from '@mui/material/TextField';   
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
-
+import Alert from '@mui/material/Alert'; // Import the Alert component
+import Snackbar from '@mui/material/Snackbar'; // Import the Snackbar component
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import IconButton from '@mui/material/IconButton';
 import PersonIcon from '@mui/icons-material/Person';
@@ -61,6 +62,9 @@ export default function Appointments({ therapyType, isLoggedIn, onLogout  }) { /
   const [assessmentData, setAssessmentData] = useState(null);
   const [error, setError] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [errorAlertOpen, setErrorAlertOpen] = useState(false);
+const [errorMessage, setErrorMessage] = useState('');
   // ... other imports and state declarations
   const handleDateChange = (date) => {
     // Convert the date to a Dayjs object if it's not already
@@ -84,7 +88,13 @@ export default function Appointments({ therapyType, isLoggedIn, onLogout  }) { /
 }, [therapyType]); 
 
 const handleTimeSelection = (time) => {
+  if (!selectedDate) {
+    setError('Please select a date first.'); // Set an error message
+    return; // Exit the function early
+  } 
+
   // Split the time range into start and end times
+  
   const [startTimeStr, endTimeStr] = time.split('-');
 
   // Assuming your selectedDate is already a Day.js object
@@ -94,7 +104,7 @@ const handleTimeSelection = (time) => {
   const endTime = selectedDate.clone()  // Clone to avoid modifying the original selectedDate
                           .hour(parseInt(endTimeStr.split(':')[0], 10))
                           .minute(parseInt(endTimeStr.split(':')[1], 10));
-
+ 
   // Update the state with the Day.js objects
   setSelectedTime({
       start: startTime,
@@ -135,6 +145,29 @@ const handleFormSubmit = (formData) => {
   handleNextAccordion('panel5'); 
 };
 
+const handleLogout = async () => {
+  setError(null);
+
+  try {
+    const response = await fetch(`${process.env.REACT_BACKEND_API}/api/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      setError(
+        errorData.error || "An error occurred during logout. Please try again later."
+      );
+    } else {
+      sessionStorage.clear();
+      onLogout();
+    }
+  } catch (error) {
+    setError("Network error. Please try again later.");
+    console.error("Network error:", error);
+  }
+};
 const handleSubmitAppointment = async () => {
   // Check if patientData and selectedDate are set
   if (!patientData || !selectedDate || !selectedTime) {
@@ -219,7 +252,7 @@ const handleSubmitAppointment = async () => {
         console.log(responseData);
 
         // Handle success
-        alert('Appointment created successfully!');
+        setAlertOpen(true);
 
     } else {
         // Handle the case where patientId is still undefined after patient creation/update
@@ -227,8 +260,8 @@ const handleSubmitAppointment = async () => {
     }
 
 } catch (error) {
-    console.error('Error during submission:', error);
-    alert(error.message); // Show a more specific error message to the user
+  setErrorMessage(error.message); // Set the error message
+  setErrorAlertOpen(true); // Show the error alert
 }
 };
 
@@ -298,10 +331,9 @@ return (
           
         </Box>
 
-        <button className="logout-btn" >
-          Logout
-        </button>
-
+        <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
         </Box>
 
         <IconButton
@@ -375,6 +407,17 @@ return (
   </div> {/*New*/}
 
     <main>
+    <Snackbar open={alertOpen} autoHideDuration={6000} onClose={() => setAlertOpen(false)}>
+  <Alert onClose={() => setAlertOpen(false)} severity="success" sx={{ width: '100%' }}>
+    Appointment created successfully!
+  </Alert>
+</Snackbar>
+
+<Snackbar open={errorAlertOpen} autoHideDuration={6000} onClose={() => setErrorAlertOpen(false)}>
+  <Alert onClose={() => setErrorAlertOpen(false)} severity="error" sx={{ width: '100%' }}>
+    {errorMessage}
+  </Alert>
+</Snackbar>
       <h1 className="title-heading"> Schedule Your Appointment Today </h1> {/*New*/}
 
       <div className="Accordion-grp">

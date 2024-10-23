@@ -31,10 +31,12 @@
     max-width: 100%;
     overflow-x: auto;
     border: 1px solid #3F4662;
-    height: 460px;
+    /* Remove fixed height */
+    /* height: 460px; */ 
     margin-left: 220px;
-    
-}
+    /* Add min-height */
+    min-height: 460px; 
+  }
 
 .schedule-manager-table {
     width: 100%;

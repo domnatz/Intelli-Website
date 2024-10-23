@@ -104,7 +104,35 @@ const scheduleMapping = {
     setSelectedDate(newDate); // Store the Dayjs object in state
     console.log('Selected Date:', formattedDate);
   };
+// Function to handle alert dismissal
+const handleAlertClose = (alertType) => {
+  if (alertType === 'error') {
+      setError(null);
+  } else if (alertType === 'success') {
+      setSuccessMessage(null);
+  }
+};
 
+// Use useEffect to automatically clear alerts after 5 seconds
+useEffect(() => {
+  let errorTimeout, successTimeout;
+  if (error) {
+      errorTimeout = setTimeout(() => {
+          handleAlertClose('error');
+      }, 5000);
+  }
+  if (successMessage) {
+      successTimeout = setTimeout(() => {
+          handleAlertClose('success');
+      }, 5000);
+  }
+
+  // Cleanup function to clear timeouts if the component unmounts or alerts change
+  return () => {
+      clearTimeout(errorTimeout);
+      clearTimeout(successTimeout);
+  };
+}, [error, successMessage]); // Re-run the effect whenever error or successMessage changes
   const handleStartTimeChange = (event) => {
     setSelectedStartTime(event.target.value);
   };
@@ -164,7 +192,6 @@ const scheduleMapping = {
         const newSchedule = await response.json(); 
         console.log('Schedule created successfully!', newSchedule);
         setSuccessMessage('Schedule assigned successfully!');
-        alert("Schedule assigned successfully!"); 
 
         // After creating a new schedule, refetch the therapists to update the list
         // fetchTherapists();
@@ -226,7 +253,6 @@ const scheduleMapping = {
 
       if (response.ok) {
         const addedTherapist = await response.json();
-        console.log('Therapist added successfully!', addedTherapist);
 
         setTherapists([...therapists, addedTherapist]);
 
@@ -235,7 +261,7 @@ const scheduleMapping = {
         setNewGender('');
         handleAddModalClose();
 
-        alert('Therapist added successfully!');
+        setSuccessMessage('Therapist added successfully!');  
       } else {
         try {
           const errorData = await response.json();
@@ -279,7 +305,7 @@ const scheduleMapping = {
           setTherapists((prevTherapists) =>
             prevTherapists.filter((therapist) => therapist._id !== therapistId)
           );
-          alert("Therapist deleted successfully!");
+          setSuccessMessage('Therapist deleted successfully!'); 
         } else {
           // Handle error (e.g., display an error message)
           const errorData = await response.json();
@@ -525,12 +551,12 @@ const scheduleMapping = {
             </Box>
           </Modal>
           {error && ( // Conditionally render the Alert for errors
-            <Alert severity="error">{error}</Alert> 
-          )}
+                        <Alert onClose={() => handleAlertClose('error')} severity="error">{error}</Alert>
+                    )}
 
-          {successMessage && ( // Conditionally render the Alert for success
-            <Alert severity="success">{successMessage}</Alert> 
-          )}
+                    {successMessage && ( // Conditionally render the Alert for success
+                        <Alert onClose={() => handleAlertClose('success')} severity="success">{successMessage}</Alert>
+                    )}
 
         </div>
       </div>
