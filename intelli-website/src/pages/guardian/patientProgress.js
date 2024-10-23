@@ -195,6 +195,11 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
       setError(error.message);
     }
   };
+  
+  const toggleDrawer = (open) => {
+    setDrawerOpen(open);
+  }; {/*New*/}
+  
   const fetchProgressReports = async (patientId) => {
     try {
       const url = `${process.env.REACT_BACKEND_API}/api/patients/${patientId}/progress`;
