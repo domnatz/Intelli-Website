@@ -22,13 +22,8 @@ import Sidebar from "./Sidebar";
 
 async function recommendLessons(patient, lessons) {
   const recommendedLessons = [];
-
-  // Log the entire lessons array to inspect its structure
-  console.log("All Lessons:", lessons);
-
   // Log each lesson to inspect its structure
   lessons.forEach((lesson, index) => {
-    console.log(`Lesson ${index + 1}:`, lesson);
   });
 
   // Fetch lessons by category
@@ -57,11 +52,6 @@ async function recommendLessons(patient, lessons) {
     return false;
   });
 
-  console.log("School Skills Lessons:", schoolSkillsLessons);
-  console.log("Physical Tasks Lessons:", physicalTasksLessons);
-  console.log("Receptive Skills Lessons:", receptiveSkillsLessons);
-  console.log("Motor Skills Lessons:", motorSkillsLessons);
-
   // School Skills Tally and Recommendations
   let schoolSkillsTally = 0;
   let schoolSkillsLesson = null;
@@ -69,8 +59,6 @@ async function recommendLessons(patient, lessons) {
   if (patient.school_skills?.problems_in_school_activities) schoolSkillsTally++;
   if (patient.school_skills?.problems_with_academics) schoolSkillsTally++;
   if (patient.school_skills?.focusing_school_problem) schoolSkillsTally++;
-
-  console.log("School Skills Tally:", schoolSkillsTally);
 
   if (schoolSkillsTally >= 3) {
     schoolSkillsLesson = schoolSkillsLessons.filter((lesson) => {
@@ -95,8 +83,6 @@ async function recommendLessons(patient, lessons) {
     });
   }
 
-  console.log("Filtered School Skills Lessons:", schoolSkillsLesson);
-
   if (schoolSkillsLesson) {
     recommendedLessons.push(...schoolSkillsLesson);
   }
@@ -114,8 +100,6 @@ async function recommendLessons(patient, lessons) {
   if (patient.physical_tasks?.dressing_problem) physicalTasksTally++;
   if (patient.physical_tasks?.walking_problem) physicalTasksTally++;
   if (patient.physical_tasks?.bathroom_problem) physicalTasksTally++;
-
-  console.log("Physical Tasks Tally:", physicalTasksTally);
 
   if (physicalTasksTally >= 3) {
     physicalTasksLesson = physicalTasksLessons.filter((lesson) => {
@@ -140,8 +124,6 @@ async function recommendLessons(patient, lessons) {
     });
   }
 
-  console.log("Filtered Physical Tasks Lessons:", physicalTasksLesson);
-
   if (physicalTasksLesson) {
     recommendedLessons.push(...physicalTasksLesson);
   }
@@ -161,8 +143,6 @@ async function recommendLessons(patient, lessons) {
   if (patient.sle_receptive_skills?.excessively_recites_words) receptiveSkillsTally++;
   if (patient.sle_receptive_skills?.said_word_then_stopped_using) receptiveSkillsTally++;
   if (patient.sle_receptive_skills?.language_development_stopped) receptiveSkillsTally++;
-
-  console.log("Receptive Skills Tally:", receptiveSkillsTally);
 
   if (receptiveSkillsTally >= 3) {
     receptiveSkillsLesson = receptiveSkillsLessons.filter((lesson) => {
@@ -187,8 +167,6 @@ async function recommendLessons(patient, lessons) {
     });
   }
 
-  console.log("Filtered Receptive Skills Lessons:", receptiveSkillsLesson);
-
   if (receptiveSkillsLesson) {
     recommendedLessons.push(...receptiveSkillsLesson);
   }
@@ -205,8 +183,6 @@ async function recommendLessons(patient, lessons) {
   if (patient.sle_motor_skills?.stuttering) motorSkillsTally++;
   if (patient.sle_motor_skills?.articulation_difficulty) motorSkillsTally++;
   if (patient.sle_motor_skills?.inconsistent_voice) motorSkillsTally++;
-
-  console.log("Motor Skills Tally:", motorSkillsTally);
 
   if (motorSkillsTally >= 3) {
     motorSkillsLesson = motorSkillsLessons.filter((lesson) => {
@@ -231,13 +207,9 @@ async function recommendLessons(patient, lessons) {
     });
   }
 
-  console.log("Filtered Motor Skills Lessons:", motorSkillsLesson);
-
   if (motorSkillsLesson) {
     recommendedLessons.push(...motorSkillsLesson);
   }
-
-  console.log("Final Recommended Lessons:", recommendedLessons);
 
   return recommendedLessons;
 }
@@ -579,7 +551,7 @@ export default function PatientInfoForm() {
 
             {/* Self Awareness */}
             <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
-  <FormLabel component="legend">Self Awareness:</FormLabel>
+  <FormLabel component="legend">Self Aware:</FormLabel>
   <RadioGroup row value={selfAware} onChange={(e) => setSelfAware(e.target.value)}>
     <FormControlLabel value="true" control={<Radio />} label="Yes" />
     <FormControlLabel value="false" control={<Radio />} label="No" />
@@ -677,14 +649,14 @@ export default function PatientInfoForm() {
   }}
 >
   <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-    Lesson Completion
+    Lesson Progession
   </Typography>
   <Typography variant="body1" sx={{ marginTop: "8px" }}>
     {progressScore === null
-      ? "No observations recorded yet"
+      ? "No observations recorded yet."
       : progressScore >= 70
-      ? "Proceed to the next lesson"
-      : "Stay in the current lesson"}
+      ? "Patient may proceed to the next lesson."
+      : "Patient needs more practice on the current lesson."}
   </Typography>
   </Box>
 

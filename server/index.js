@@ -168,7 +168,7 @@ app.post('/api/users', async (req, res) => {
           from: 'projectintellispeechcapstone@gmail.com', 
           to: savedUser.email_address,
           subject: 'Email Verification',
-          html: `<p>Click this link to verify your email: <a href="${verificationLink}">${verificationLink}</a></p>`
+          html: `<p>COPY this link and PASTE it in your browser to verify your account: <a href="${verificationLink}">${verificationLink}</a></p>`
       };
 
       await transporter.sendMail(mailOptions);

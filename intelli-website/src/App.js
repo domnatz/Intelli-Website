@@ -7,6 +7,7 @@ import StaffHomePage from "./pages/admin/staffHome";
 import SchedManagerPage from "./pages/admin/ScheduleManager";
 import LessonDetailsPage from './pages/admin/LessonDetails';
 import TherapistSchedulePage from "./pages/admin/TherapistSchedule";
+import VerificationPage from "./VerificationPage";
 import UpcomingAppStaffPage from "./pages/admin/UpcomingAppStaff";
 import Sidebar from "./pages/admin/Sidebar";
 import AppointmentPage from "./pages/guardian/Appointments";
@@ -67,6 +68,7 @@ export default function App() {
         {/* Public Routes (accessible to all users) */}
         <Route index element={<LandingPage />} />
         <Route path="/register" element={<SignUpPage />} />
+        <Route path="/verify/:token" element={<VerificationPage />} /> 
         <Route
           path="/login"
           element={
