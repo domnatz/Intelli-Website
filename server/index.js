@@ -181,7 +181,7 @@ app.post('/api/users', async (req, res) => {
 });
 
 // New route for staff to create accounts (with role selection)
-app.post('/api/staff', authenticateUser, isAdmin, async (req, res) => { 
+app.post('/api/staff', async (req, res) => { 
   try {
     // Include 'name' in the destructuring assignment
     const { name, username, email_address, password, role } = req.body;

@@ -33,75 +33,76 @@ export default function StaffRegistrationPage() {
         setError(null);
         setSuccessMessage(null);
         setIsLoading(true);
-
+      
         if (formData.password !== formData.confirmPassword) {
-            setError("Passwords do not match!");
-            setIsLoading(false);
-            return;
+          setError("Passwords do not match!");
+          setSnackbarSeverity('error');
+          setSnackbarMessage('Passwords do not match!');
+          setOpenSnackbar(true);
+          setIsLoading(false);
+          return;
         }
-
+      
         try {
-            const response = await fetch(
-                `${process.env.REACT_BACKEND_API}/api/staff`, 
-                {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(formData),
-                }
-            );
-
-            setIsLoading(false);
-
-            if (response.ok) {
-                const savedUser = await response.json();
-                console.log("Staff signup successful!", savedUser);
-                setSuccessMessage("Staff signup successful!");
-                setSnackbarSeverity('success');
-                setSnackbarMessage('Staff signup successful!');
-                setOpenSnackbar(true);
-                setFormData({
-                    name: "",
-                    contact_number: "",
-                    username: "",
-                    email_address: "",
-                    password: "",
-                    confirmPassword: "",
-                });
-                navigate('/home', { replace: true });
-            } else {
-                try {
-                    const errorData = await response.json();
-                    if (errorData && errorData.error) {
-                        setError(errorData.error);
-                        setSnackbarSeverity('error');
-                        setSnackbarMessage(errorData.error);
-                        setOpenSnackbar(true);
-                    } else {
-                        setError("An error occurred during signup. Please try again later.");
-                        setSnackbarSeverity('error');
-                        setSnackbarMessage('An error occurred during signup. Please try again later.');
-                        setOpenSnackbar(true);
-                    }
-                } catch (parseError) {
-                    setError("Unexpected error from server. Please try again later.");
-                    setSnackbarSeverity('error');
-                    setSnackbarMessage('Unexpected error from server. Please try again later.');
-                    setOpenSnackbar(true);
-                    console.error("Error parsing server response:", parseError);
-                }
+          const response = await fetch(
+            `${process.env.REACT_BACKEND_API}/api/staff`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
             }
-        } catch (error) {
-            setIsLoading(false);
-            setError("Network error. Please try again later.");
-            setSnackbarSeverity('error');
-            setSnackbarMessage('Network error. Please try again later.');
+          );
+      
+          setIsLoading(false); 
+      
+          if (response.ok) {
+            const savedUser = await response.json();
+            setSuccessMessage("Staff signup successful!");
+            setSnackbarSeverity('success');
+            setSnackbarMessage('Staff signup successful!');
             setOpenSnackbar(true);
-            console.error("Network error:", error);
+            setFormData({
+              name: "",
+              contact_number: "",
+              username: "",
+              email_address: "",
+              password: "",
+              confirmPassword: "",
+            });
+            navigate('/home', { replace: true }); 
+          } else {
+            try {
+              const errorData = await response.json();
+              if (errorData && errorData.error) {
+                setError(errorData.error);
+                setSnackbarSeverity('error');
+                setSnackbarMessage(errorData.error);
+                setOpenSnackbar(true);
+              } else {
+                setError("An error occurred during signup. Please try again later.");
+                setSnackbarSeverity('error');
+                setSnackbarMessage('An error occurred during signup. Please try again later.');
+                setOpenSnackbar(true);
+              }
+            } catch (parseError) {
+              setError("Unexpected error from server. Please try again later.");
+              setSnackbarSeverity('error');
+              setSnackbarMessage('Unexpected error from server. Please try again later.');
+              setOpenSnackbar(true);
+              console.error("Error parsing server response:", parseError);
+            }
+          }
+        } catch (error) {
+          setIsLoading(false);
+          setError("Network error. Please try again later.");
+          setSnackbarSeverity('error');
+          setSnackbarMessage('Network error. Please try again later.');
+          setOpenSnackbar(true);
+          console.error("Network error:", error);
         }
-    };
+      };
 
     const handleCloseSnackbar = () => {
         setOpenSnackbar(false);
