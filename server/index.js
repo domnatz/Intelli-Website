@@ -351,19 +351,38 @@ app.get('/api/appointments', async (req, res) => {
 app.put('/api/appointments/:appointmentId/confirm', async (req, res) => {
   try {
     const appointmentId = req.params.appointmentId;
+    let therapist_id = req.body.therapist_id; 
 
-    // Find the appointment and update its status to 'confirmed'
+    // If therapist_id is not a valid ObjectId, try to find it by therapist_name
+    if (!mongoose.Types.ObjectId.isValid(therapist_id)) {
+      const therapist = await Therapist.findOne({ therapist_name: therapist_id });
+      if (therapist) {
+        therapist_id = therapist._id; 
+      } else {
+        return res.status(400).json({ error: 'Invalid therapist ID or name' });
+      }
+    }
+
+    // Now you have a valid ObjectId for therapist_id, proceed with the update
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { appointment_status: 'Confirmed' }, // Update the correct field: appointment_status
-      { new: true } 
+      { 
+        appointment_status: 'Confirmed', 
+        therapist_id: therapist_id 
+      },
+      { new: true }
     );
 
     if (!updatedAppointment) {
       return res.status(404).json({ error: 'Appointment not found' });
     }
 
-    res.json(updatedAppointment);
+    // Include the therapist_id in the response
+    res.json({ 
+      ...updatedAppointment._doc, 
+      therapist_id: updatedAppointment.therapist_id 
+    }); 
+
   } catch (error) {
     console.error('Error confirming appointment:', error);
     res.status(500).json({ error: 'Internal Server Error' });

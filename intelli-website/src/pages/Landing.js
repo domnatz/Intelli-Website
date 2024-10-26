@@ -92,7 +92,7 @@ export default function Landing() {
   return (
     <div className="Landing-Container">
       {/* Navbar */}
-      <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000 }}>
+      <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000, height: '80px' }}>
   <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <img className="Logo" src={logo} alt="Logo" style={{ marginRight: 'px', width: '70px', height: '60px' }} />
