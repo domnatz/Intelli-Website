@@ -20,57 +20,56 @@ export default function UpcomingAppStaff() {
   const [error, setError] = useState(null);
   const [selectedTherapist, setSelectedTherapist] = useState({});
 
-    useEffect(() => {
-      const fetchAppointments = async () => {
-        try {
-            const response = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`);
-
-            
-            if (!response.ok) {
-                throw new Error("Error fetching appointments");
-            }
-            const data = await response.json();
-            console.log("Fetched appointments data:", data);
-            
-            const appointmentsWithTherapists = await Promise.all(
-                data.map(async (appointment) => {
-                    // Extract date and time range from appointment
-                    const appointmentDate = new Date(appointment.start_time);
-                    const formattedDate = appointmentDate.toLocaleDateString('en-CA');
-                    const startTime = new Date(appointment.start_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
-                    const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
-                    const selectedSchedule = `${startTime} - ${endTime}`;
-                
-                    // Fetch therapists for this appointment's date and time
-                    const therapistsResponse = await fetch(
-                      `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`,
-                      { credentials: 'include' } 
-                    );
-                    if (!therapistsResponse.ok) {
-                      const errorData = await therapistsResponse.json();
-                      console.error("Error fetching therapists for appointment:", errorData.error || therapistsResponse.statusText);
-                      throw new Error("Error fetching therapists for appointment");
-                    }
-                    const therapistsData = await therapistsResponse.json();
-                    appointment.availableTherapist = therapistsData;
-
-                    return appointment;
-                })
-            );
-
-            setAppointments(appointmentsWithTherapists);
-        } catch (err) {
-            console.error("Error fetching appointments:", err);
-            setError(
-                "Failed to fetch appointments. Please try again later."
-            );
-        } finally {
-            setLoading(false);
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`);
+  
+        if (!response.ok) {
+          throw new Error("Error fetching appointments");
         }
+        const data = await response.json();
+        console.log("Fetched appointments data:", data);
+  
+        const appointmentsWithTherapists = await Promise.all(
+          data.map(async (appointment) => {
+            const appointmentDate = new Date(appointment.start_time);
+            const formattedDate = appointmentDate.toLocaleDateString('en-CA'); // Check this formatting!
+            const startTime = appointmentDate.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
+            const selectedSchedule = `${startTime} - ${endTime}`;
+  
+            console.log("Formatted Date:", formattedDate);
+            console.log("Selected Schedule:", selectedSchedule);
+  
+            const therapistsResponse = await fetch(
+              `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`,
+              { credentials: 'include' }
+            );
+  
+            if (!therapistsResponse.ok) {
+              const errorData = await therapistsResponse.json();
+              console.error("Error fetching therapists for appointment:", errorData.error || therapistsResponse.statusText);
+              throw new Error("Error fetching therapists for appointment");
+            }
+            const therapistsData = await therapistsResponse.json();
+            appointment.availableTherapist = therapistsData;
+  
+            return appointment;
+          })
+        );
+  
+        setAppointments(appointmentsWithTherapists);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+        setError("Failed to fetch appointments. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
     };
-
+  
     fetchAppointments();
-}, []);
+  }, []);
 
 const handleTherapistChange = (event, appointmentId) => {
   // 1. Get the selected therapist ID from the event
