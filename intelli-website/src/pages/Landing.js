@@ -95,10 +95,10 @@ export default function Landing() {
       <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000, height: '80px' }}>
   <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <img className="Logo" src={logo} alt="Logo" style={{ marginRight: 'px', width: '70px', height: '60px', marginBottom: 16 }} />
+      <img className="Logo" src={logo} alt="Logo" style={{ marginRight: 'px', width: '70px', height: '60px', marginBottom: 15 }} />
       <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '20px' }}>
       <nav >
-      <ul style={{ display: 'flex', gap: '30px', listStyle: 'none', padding: 0, marginBottom: 28 }}>
+      <ul style={{ display: 'flex', gap: '30px', listStyle: 'none', padding: 0, marginBottom: 29 }}>
           <li className= "lia" onClick={() => setActiveSection('home')}>Home</li>
           <li className= "lia"onClick={() => setActiveSection('about')}>About Us</li>
           <li className= "lia" onClick={() => setActiveSection('services')}>Our Services</li>
