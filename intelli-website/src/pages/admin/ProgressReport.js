@@ -581,7 +581,7 @@ export default function PatientInfoForm() {
     <FormControlLabel value="false" control={<Radio />} label="No" />
   </RadioGroup>   
 </FormControl>
-
+<br />
 {/* Lesson Engagement */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
   <FormLabel component="legend">Lesson Engagement:</FormLabel>
