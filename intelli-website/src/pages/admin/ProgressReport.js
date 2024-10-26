@@ -468,7 +468,8 @@ export default function PatientInfoForm() {
         }, 3000);
 
         // Fetch updated patient data
-        const updatedPatientData = await fetchPatient();
+        const updatedPatient = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}`);
+        const updatedPatientData = await updatedPatient.json();
         setPatient(updatedPatientData);
       } else {
         console.error("Error assigning lesson:", response.status);
