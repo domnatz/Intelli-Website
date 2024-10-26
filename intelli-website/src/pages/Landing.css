@@ -8,7 +8,7 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  height: 80px;
+  height: 90px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000; /* Ensure it stays above other content */
 }
@@ -239,8 +239,8 @@ padding-bottom: 0;
   cursor: pointer;
   font-size: 18px;
   font-weight: bold;
-  margin-bottom:20px;
-  margin-left: 50px;
+  margin-bottom:40px;
+  margin-left: 10px;
 
 }
   
@@ -453,17 +453,7 @@ p{
   }
 
   .apt-btn {
-    width: 220px;
-    height: 50px;
-    padding: 5px;
-    background: #2D848B;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom:40px;
-    margin-left: 10px;
+    margin-top: 10px;
+    width: 100%;
   }
 }
