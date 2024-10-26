@@ -40,7 +40,8 @@ export default function UpcomingAppStaff() {
                     const startTime = new Date(appointment.start_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
                     const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
                     const selectedSchedule = `${startTime} - ${endTime}`;
-                
+                    console.log("Formatted Date:", formattedDate); 
+                    console.log("Selected Schedule:", selectedSchedule);
                     // Fetch therapists for this appointment's date and time
                     const therapistsResponse = await fetch(
                         `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`,
