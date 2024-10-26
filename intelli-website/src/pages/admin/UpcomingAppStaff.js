@@ -263,9 +263,9 @@ console.log("Therapist ID:", therapistId);
       >
         <option key="default-therapist" value="">Select Therapist</option> 
         {appointment.availableTherapist.map((therapist) => (
-          <option key={therapist.id} value={therapist.id}>
-            {therapist.therapist_name}
-          </option>
+          <option key={therapist._id} value={therapist._id}>
+          {therapist.therapist_name}
+      </option>
         ))}
       </select>
     ) : (
