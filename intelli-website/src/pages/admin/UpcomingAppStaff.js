@@ -34,11 +34,13 @@ export default function UpcomingAppStaff() {
         const appointmentsWithTherapists = await Promise.all(
           data.map(async (appointment) => {
             const appointmentDate = new Date(appointment.start_time);
-            const formattedDate = appointmentDate.toLocaleDateString('en-CA'); // Check this formatting!
+            appointmentDate.setUTCHours(0, 0, 0, 0); // Set to midnight UTC
+        
+            const formattedDate = appointmentDate.toISOString().split('T')[0]; // Use ISO 8601 format
             const startTime = appointmentDate.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
             const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
             const selectedSchedule = `${startTime} - ${endTime}`;
-  
+        
             console.log("Formatted Date:", formattedDate);
             console.log("Selected Schedule:", selectedSchedule);
   
