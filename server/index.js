@@ -1014,6 +1014,8 @@ app.get('/api/therapists-avail', async (req, res) => {
     console.log('Received selectedSchedule:', selectedSchedule);
 
 
+
+
     if (!selectedSchedule || !selectedDate) {
       // Handle missing parameters explicitly
       return res.status(400).json({ error: 'Missing schedule or date' });
@@ -1029,9 +1031,6 @@ app.get('/api/therapists-avail', async (req, res) => {
     const therapists = await Therapist.find().populate('schedule');
 
 
-    console.log('Fetched therapists (before filtering):', therapists);
-
-
     // Extract start and end times from selectedSchedule
     let startTimeStr, endTimeStr;
     if (typeof selectedSchedule === 'string' && selectedSchedule.includes(' - ')) {
@@ -1043,23 +1042,13 @@ app.get('/api/therapists-avail', async (req, res) => {
     }
 
 
-    // Create Date objects for the start and end of the selected time slot (in UTC)
-    const startTimeUTC = new Date(Date.UTC(
-      selectedDateObj.getUTCFullYear(),
-      selectedDateObj.getUTCMonth(),
-      selectedDateObj.getUTCDate(),
-      parseInt(startTimeStr.split(':')[0], 10),
-      parseInt(startTimeStr.split(':')[1], 10)
-    ));
-    const endTimeUTC = new Date(Date.UTC(
-      selectedDateObj.getUTCFullYear(),
-      selectedDateObj.getUTCMonth(),
-      selectedDateObj.getUTCDate(),
-      parseInt(endTimeStr.split(':')[0], 10),
-      parseInt(endTimeStr.split(':')[1], 10)
-    ));
+    const [startHour, startMinute] = startTimeStr.split(':').map(Number);
+    const [endHour, endMinute] = endTimeStr.split(':').map(Number);
+    const startTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute);
+    const endTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute);
 
 
+    console.log('Fetched therapists (before filtering):', therapists);
     // Filter therapists
     const availableTherapists = therapists.filter(therapist => {
       if (!therapist.schedule || !Array.isArray(therapist.schedule)) {
@@ -1080,13 +1069,16 @@ app.get('/api/therapists-avail', async (req, res) => {
         }
 
 
-        // Check if the schedule's date and time range match
-        const isDateMatch = therapistSchedule.start_time.getUTCFullYear() === selectedDateObj.getUTCFullYear() &&
-          therapistSchedule.start_time.getUTCMonth() === selectedDateObj.getUTCMonth() &&
-          therapistSchedule.start_time.getUTCDate() === selectedDateObj.getUTCDate();
-       
-          const isScheduleMatch = therapistSchedule.start_time.getTime() < endTimeUTC.getTime() &&
-          therapistSchedule.end_time.getTime() > startTimeUTC.getTime();
+        const scheduleStartTime = new Date(therapistSchedule.start_time);
+        const scheduleEndTime = new Date(therapistSchedule.end_time);
+        const isScheduleMatch = scheduleStartTime.getTime() <= endTime.getTime() &&
+                                 scheduleEndTime.getTime() >= startTime.getTime();
+
+
+        // Check if the schedule's date matches the selected date
+        const isDateMatch = scheduleStartTime.getDate() === selectedDateObj.getDate() &&
+                            scheduleStartTime.getMonth() === selectedDateObj.getMonth() &&
+                            scheduleStartTime.getFullYear() === selectedDateObj.getFullYear();
 
 
         return isScheduleMatch && isDateMatch;
@@ -1094,10 +1086,16 @@ app.get('/api/therapists-avail', async (req, res) => {
     });
 
 
+
+
     console.log('Available therapists:', availableTherapists);
 
 
+
+
     res.json(availableTherapists);
+
+
 
 
   } catch (error) {
