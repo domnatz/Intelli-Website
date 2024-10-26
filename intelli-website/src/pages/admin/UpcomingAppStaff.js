@@ -16,186 +16,139 @@ import {
 
 export default function UpcomingAppStaff() {
   const [appointments, setAppointments] = useState([]);
+  const [therapists, setTherapists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedTherapist, setSelectedTherapist] = useState({});
 
-    useEffect(() => {
-      const fetchAppointments = async () => {
-        try {
-            const response = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`);
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/appointments`);
 
-            
-            if (!response.ok) {
-                throw new Error("Error fetching appointments");
-            }
-            const data = await response.json();
-            console.log("Fetched appointments data:", data);
-            
-            const appointmentsWithTherapists = await Promise.all(
-                data.map(async (appointment) => {
-                    // Extract date and time range from appointment
-                    const appointmentDate = new Date(appointment.start_time);
-                    const formattedDate = appointmentDate.toLocaleDateString('en-CA');
-                    const startTime = new Date(appointment.start_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
-                    const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
-                    const selectedSchedule = `${startTime} - ${endTime}`;
-                
-                    // Fetch therapists for this appointment's date and time
-                    const therapistsResponse = await fetch(
-                        `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`,
-                        {credentials: 'include'}
-                    );
-                    if (!therapistsResponse.ok) {
-                      const errorData = await therapistsResponse.json();
-                      console.error("Error fetching therapists for appointment:", errorData.error || therapistsResponse.statusText);
-                      throw new Error("Error fetching therapists for appointment");
-                    }
-                    const therapistsData = await therapistsResponse.json();
-                    appointment.availableTherapist = therapistsData;
-
-                    return appointment;
-                })
-            );
-
-            setAppointments(appointmentsWithTherapists);
-        } catch (err) {
-            console.error("Error fetching appointments:", err);
-            setError(
-                "Failed to fetch appointments. Please try again later."
-            );
-        } finally {
-            setLoading(false);
+        if (!response.ok) {
+          throw new Error("Error fetching appointments");
         }
+        const data = await response.json();
+        console.log("Fetched appointments data:", data);
+
+        setAppointments(data);
+      } catch (err) {
+        console.error("Error fetching appointments:", err);
+        setError("Failed to fetch appointments. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const fetchTherapists = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_BACKEND_API}/api/therapists`, { credentials: 'include' });
+        if (!response.ok) {
+          throw new Error("Error fetching therapists");
+        }
+        const therapistsData = await response.json();
+        setTherapists(therapistsData);
+      } catch (error) {
+        console.error("Error fetching therapists:", error);
+      }
     };
 
     fetchAppointments();
-}, []);
+    fetchTherapists();
+  }, []);
 
-const handleTherapistChange = (event, appointmentId) => {
-  // 1. Get the selected therapist ID from the event
-  const selectedTherapistId = event.target.value; 
+  const handleTherapistChange = (event, appointmentId) => {
+    const selectedTherapistId = event.target.value;
+    setSelectedTherapist(prevState => ({
+      ...prevState,
+      [appointmentId]: selectedTherapistId
+    }));
+  };
 
-  setAppointments(prevAppointments => {
-    return prevAppointments.map(appointment => {
-      if (appointment._id === appointmentId) {
-        // Update the therapistId for the selected appointment
-        return { ...appointment, therapist_id: selectedTherapistId }; 
-      } else {
-        return appointment;
+  const handleConfirmAppointment = async (appointmentId) => {
+    try {
+      const therapistId = selectedTherapist[appointmentId]; 
+      if (!therapistId) {
+        alert("Please select a therapist before confirming.");
+        return;
       }
-    });
-  });
-};
-
-const handleConfirmAppointment = async (appointmentId) => {
-  const therapistId = selectedTherapist[appointmentId];
-  try {
-    // Get therapistId from selectedTherapist state
-    const therapistId = selectedTherapist[appointmentId]; 
-
-    if (!therapistId) {
-      // Handle the case where no therapist is selected
-      alert("Please select a therapist before confirming."); 
-      return;
-    }
-
-    const response = await fetch(
-      `${process.env.REACT_BACKEND_API}/api/appointments/${appointmentId}/confirm`,
-      {
-        method: "PUT",
-        headers: {
-          'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify({ therapist_id: therapistId }) 
-      }
-    );
-
-    if (response.ok) {
-      const updatedAppointment = await response.json(); 
-
-      // Update the appointments state using the updated data from the server
-      setAppointments((prevAppointments) => {
-        const updatedAppointments = prevAppointments.map(
-          (appointment) =>
-            appointment._id === appointmentId
-              ? updatedAppointment // Use the updated appointment from the server
-              : appointment
-        );
-        return updatedAppointments;
-      });
-
-      alert("Appointment confirmed!");
-    } else {
-      // Handle error (e.g., display an error message)
-      try {
-        const errorData = await response.json();
-        console.error(
-          "Error confirming appointment:",
-          errorData.error || response.statusText
-        );
-      } catch (parseError) {
-        console.error(
-          "Error parsing server response:",
-          parseError
-        );
-        alert(
-          "Unexpected response from the server. Please try again later."
-        );
-      }
-    }
-
-  } catch (error) {
-    console.error("Error confirming appointment:", error);
-    alert("Network error. Please check your connection.");
-  }
-  console.log("Confirm button clicked!");
-console.log("Appointment ID:", appointmentId);
-console.log("Therapist ID:", therapistId);
-};
-
-    const handleDeleteAppointment = async (appointmentId) => {
-        if (
-            window.confirm(
-                "Are you sure you want to delete this appointment?"
-            )
-        ) {
-            try {
-                const response = await fetch(
-                    `${process.env.REACT_BACKEND_API}/api/appointments/${appointmentId}`,
-                    {
-                        method: "DELETE",
-                    }
-                );
-
-                if (response.ok) {
-                    setAppointments((prevAppointments) =>
-                        prevAppointments.filter(
-                            (appointment) => appointment._id !== appointmentId
-                        )
-                    );
-                } else {
-                    const errorData = await response.json();
-                    console.error(
-                        "Error deleting appointment:",
-                        errorData.error || response.statusText
-                    );
-                }
-            } catch (error) {
-                console.error("Error deleting appointment:", error);
-            }
+  
+      const response = await fetch(
+        `${process.env.REACT_BACKEND_API}/api/appointments/${appointmentId}/confirm`, 
+        {
+          method: "PUT",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ therapist_id: therapistId })
         }
-    };
+      );
+  
+      if (response.ok) {
+        const updatedAppointment = await response.json();
+        setAppointments((prevAppointments) => {
+          return prevAppointments.map((appointment) =>
+            appointment._id === appointmentId ? updatedAppointment : appointment
+          );
+        });
+        alert("Appointment confirmed!"); 
+      } else {
+        // Handle error (e.g., display an error message)
+        try {
+          const errorData = await response.json(); 
+          console.error("Error confirming appointment:", errorData.error || response.statusText);
+          alert("Error confirming appointment: " + (errorData.error || "Unknown error"));
+        } catch (parseError) {
+          console.error("Error parsing server response:", parseError);
+          alert("Unexpected response from the server. Please try again later.");
+        }
+      }
+  
+    } catch (error) {
+      console.error("Error confirming appointment:", error);
+      alert("Network error. Please check your connection.");
+    }
+  };
 
-    return (
-        <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+  const handleDeleteAppointment = async (appointmentId) => {
+    if (window.confirm("Are you sure you want to delete this appointment?")) {
+      try {
+        const response = await fetch(
+          `${process.env.REACT_BACKEND_API}api/appointments/${appointmentId}`,
+          {
+            method: "DELETE",
+          }
+        );
+
+        if (response.ok) {
+          setAppointments((prevAppointments) =>
+            prevAppointments.filter(
+              (appointment) => appointment._id !== appointmentId
+            )
+          );
+        } else {
+          const errorData = await response.json();
+          console.error(
+            "Error deleting appointment:",
+            errorData.error || response.statusText
+          );
+        }
+      } catch (error) {
+        console.error("Error deleting appointment:", error);
+      }
+    }
+  };
+
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Sidebar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           padding: '30px',
-          marginLeft: '280px', // Align with sidebar
+          marginLeft: '280px',
           transition: 'margin 0.3s ease',
         }}
       >
@@ -240,46 +193,41 @@ console.log("Therapist ID:", therapistId);
                 !error &&
                 appointments.map((appointment) => (
                   <TableRow key={appointment._id}>
-                  <TableCell>{appointment.appointment_type}</TableCell>
+                    <TableCell>{appointment.appointment_type}</TableCell>
 
-                  {/* Therapist Selection/Display */}
-                  <TableCell>
-                  {appointment.appointment_status === 'Confirmed' && appointment.therapist_id ? (
-    // Show the therapist's ID if the appointment is confirmed and therapist_id exists
-    appointment.availableTherapist &&  // Check if availableTherapist is an array
-    appointment.availableTherapist.find(therapist => therapist._id === appointment.therapist_id)?.therapist_name // Use therapist._id for comparison
+                    {/* Therapist Selection/Display */}
+                    <TableCell>
+  {appointment.appointment_status === 'Confirmed' && appointment.therapist_id ? (
+    // Show the therapist's name if the appointment is confirmed and therapist_id exists
+    therapists.find(therapist => therapist._id === appointment.therapist_id)?.therapist_name
   ) : (
     // Otherwise, show the therapist selection dropdown
-    appointment.availableTherapist ? (
-      <select 
-        value={selectedTherapist[appointment._id] || ""}
-        onChange={(e) => { 
-          setSelectedTherapist(prevState => ({
-            ...prevState,
-            [appointment._id]: e.target.value 
-          }));
-          handleTherapistChange(e, appointment._id);
-        }}
-      >
-        <option key="default-therapist" value="">Select Therapist</option> 
-        {appointment.availableTherapist.map((therapist) => (
-          <option key={therapist.id} value={therapist.id}>
-            {therapist.therapist_name}
-          </option>
-        ))}
-      </select>
-    ) : (
-      <span>Loading therapists...</span> 
-    )
+    <select
+      value={selectedTherapist[appointment._id] || ""}
+      onChange={(e) => {
+        setSelectedTherapist(prevState => ({
+          ...prevState,
+          [appointment._id]: e.target.value // Use therapist._id for value
+        }));
+        handleTherapistChange(e, appointment._id);
+      }}
+    >
+      <option key="default-therapist" value="">Select Therapist</option>
+      {therapists.map((therapist) => (
+        <option key={therapist._id} value={therapist._id}> {/* Use therapist._id for value */}
+          {therapist.therapist_name}
+        </option>
+      ))}
+    </select>
   )}
 </TableCell>
                     <TableCell>{appointment.patient_name}</TableCell>
                     <TableCell>
-                    {(() => {
+                      {(() => {
                         const appointmentDate = new Date(appointment.start_time);
                         const formattedDate = appointmentDate.toLocaleDateString('en-US');
                         return formattedDate;
-                    })()}
+                      })()}
                     </TableCell>
                     <TableCell>
                       {new Date(appointment.start_time).toLocaleTimeString([], {
@@ -298,7 +246,7 @@ console.log("Therapist ID:", therapistId);
                       <Button
                         variant="contained"
                         color="success"
-                        sx={{ marginRight: 1, backgroundColor: '#2D848B', color: '#fff'  }}
+                        sx={{ marginRight: 1, backgroundColor: '#2D848B', color: '#fff' }}
                         onClick={() => handleConfirmAppointment(appointment._id)}
                       >
                         Confirm
@@ -307,12 +255,14 @@ console.log("Therapist ID:", therapistId);
                       <Button
                         aria-label="delete"
                         color="error"
-                        sx={{ marginRight: 1,
+                        sx={{
+                          marginRight: 1,
                           backgroundColor: '#e53935',
                           color: '#fff',
-                        '&:hover': { backgroundColor: '#d32f2f' }, }}
+                          '&:hover': { backgroundColor: '#d32f2f' },
+                        }}
                         onClick={() => handleDeleteAppointment(appointment._id)}
-                        >
+                      >
                         Delete
                       </Button>
                     </TableCell>

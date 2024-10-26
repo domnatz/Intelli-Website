@@ -351,24 +351,14 @@ app.get('/api/appointments', async (req, res) => {
 app.put('/api/appointments/:appointmentId/confirm', async (req, res) => {
   try {
     const appointmentId = req.params.appointmentId;
-    let therapist_id = req.body.therapist_id; 
+    const therapist_id = req.body.therapist_id; // No need for let since we're not reassigning
 
-    // If therapist_id is not a valid ObjectId, try to find it by therapist_name
-    if (!mongoose.Types.ObjectId.isValid(therapist_id)) {
-      const therapist = await Therapist.findOne({ therapist_name: therapist_id });
-      if (therapist) {
-        therapist_id = therapist._id; 
-      } else {
-        return res.status(400).json({ error: 'Invalid therapist ID or name' });
-      }
-    }
-
-    // Now you have a valid ObjectId for therapist_id, proceed with the update
+    // Directly use the therapist_id, assuming it's a valid ObjectId
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { 
-        appointment_status: 'Confirmed', 
-        therapist_id: therapist_id 
+      {
+        appointment_status: 'Confirmed',
+        therapist_id: therapist_id
       },
       { new: true }
     );
@@ -377,11 +367,7 @@ app.put('/api/appointments/:appointmentId/confirm', async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found' });
     }
 
-    // Include the therapist_id in the response
-    res.json({ 
-      ...updatedAppointment._doc, 
-      therapist_id: updatedAppointment.therapist_id 
-    }); 
+    res.json(updatedAppointment); // Directly return the updated appointment
 
   } catch (error) {
     console.error('Error confirming appointment:', error);
@@ -1032,86 +1018,6 @@ app.post('/api/schedules', async (req, res) => {
       return res.status(400).json({ error: errors });
     } else {
       return res.status(500).json({ error: 'Internal Server Error' });
-    }
-  }
-});
-app.get('/api/therapists-avail', async (req, res) => {
-  try {
-    let { selectedSchedule, selectedDate } = req.query;
-
-    console.log('Received selectedDate:', selectedDate);
-    console.log('Received selectedSchedule:', selectedSchedule);
-
-
-    if (!selectedSchedule || !selectedDate) {
-      // Handle missing parameters explicitly
-      return res.status(400).json({ error: 'Missing schedule or date' });
-    }
-
-    // Convert selectedDate to a Date object and set it to midnight UTC
-    const selectedDateObj = new Date(selectedDate);
-    selectedDateObj.setUTCHours(0, 0, 0, 0);
-
-    // Fetch therapists and populate their schedules
-    const therapists = await Therapist.find().populate('schedule');
-
-    // Extract start and end times from selectedSchedule
-    let startTimeStr, endTimeStr;
-    if (typeof selectedSchedule === 'string' && selectedSchedule.includes(' - ')) {
-      [startTimeStr, endTimeStr] = selectedSchedule.split(' - ');
-    } else {
-      // If the format is not as expected, log an error and return an error response
-      console.error('Unexpected selectedSchedule format:', selectedSchedule);
-      return res.status(400).json({ error: 'Invalid time range format' });
-    }
-
-    const [startHour, startMinute] = startTimeStr.split(':').map(Number);
-    const [endHour, endMinute] = endTimeStr.split(':').map(Number);
-    const startTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute);
-    const endTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute);
-
-    console.log('Fetched therapists (before filtering):', therapists);
-    // Filter therapists
-    const availableTherapists = therapists.filter(therapist => {
-      if (!therapist.schedule || !Array.isArray(therapist.schedule)) {
-        return false;
-      }
-
-      return therapist.schedule.some(therapistSchedule => {
-        // Check for valid schedule entry and Date objects
-        if (
-          !therapistSchedule ||
-          !therapistSchedule.start_time ||
-          !therapistSchedule.end_time ||
-          !(therapistSchedule.start_time instanceof Date) ||
-          !(therapistSchedule.end_time instanceof Date)
-        ) {
-          return false;
-        }
-
-
-        const scheduleStartTime = new Date(therapistSchedule.start_time);
-        const scheduleEndTime = new Date(therapistSchedule.end_time);
-        const isScheduleMatch = scheduleStartTime.getTime() <= endTime.getTime() &&
-                                 scheduleEndTime.getTime() >= startTime.getTime();
-
-
-        // Check if the schedule's date matches the selected date
-        const isDateMatch = scheduleStartTime.getDate() === selectedDateObj.getDate() &&
-                            scheduleStartTime.getMonth() === selectedDateObj.getMonth() &&
-                            scheduleStartTime.getFullYear() === selectedDateObj.getFullYear();
-
-        return isScheduleMatch && isDateMatch;
-      });
-    });
-
-    console.log('Available therapists:', availableTherapists);
-
-    res.json(availableTherapists);
-  } catch (error) {
-    console.error('Error fetching therapists:', error);
-    if (!res.headersSent) {
-      res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 });
