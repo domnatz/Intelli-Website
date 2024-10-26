@@ -1087,7 +1087,8 @@ app.get('/api/therapists-avail', async (req, res) => {
           return false;
         }
 
-        const scheduleStartTime = new Date(therapistSchedule.start_time);
+        // Adjust scheduleStartTime to account for the time zone offset
+        const scheduleStartTime = new Date(therapistSchedule.start_time); 
         const scheduleEndTime = new Date(therapistSchedule.end_time);
 
         // Detailed logging for debugging
@@ -1099,7 +1100,6 @@ app.get('/api/therapists-avail', async (req, res) => {
         const isScheduleMatch = scheduleStartTime.getTime() <= endTime.getTime() &&
           scheduleEndTime.getTime() >= startTime.getTime();
 
-        // Direct date comparison using UTC methods
         const isDateMatch = 
             scheduleStartTime.getUTCFullYear() === selectedDateObj.getUTCFullYear() &&
             scheduleStartTime.getUTCMonth() === selectedDateObj.getUTCMonth() &&
