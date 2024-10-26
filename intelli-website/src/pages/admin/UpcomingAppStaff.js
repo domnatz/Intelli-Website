@@ -43,7 +43,8 @@ export default function UpcomingAppStaff() {
                 
                     // Fetch therapists for this appointment's date and time
                     const therapistsResponse = await fetch(
-                        `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`
+                        `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`,
+                        {credentials: true}
                     );
                     if (!therapistsResponse.ok) {
                       const errorData = await therapistsResponse.json();
