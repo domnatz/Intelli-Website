@@ -40,12 +40,10 @@ export default function UpcomingAppStaff() {
                     const startTime = new Date(appointment.start_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
                     const endTime = new Date(appointment.end_time).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
                     const selectedSchedule = `${startTime} - ${endTime}`;
-                    console.log("Formatted Date:", formattedDate); 
-                    console.log("Selected Schedule:", selectedSchedule);
+                
                     // Fetch therapists for this appointment's date and time
                     const therapistsResponse = await fetch(
-                        `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`,
-                        { credentials: 'include' }
+                        `${process.env.REACT_BACKEND_API}/api/therapists-avail?selectedDate=${formattedDate}&selectedSchedule=${selectedSchedule}`
                     );
                     if (!therapistsResponse.ok) {
                       const errorData = await therapistsResponse.json();
@@ -264,9 +262,9 @@ console.log("Therapist ID:", therapistId);
       >
         <option key="default-therapist" value="">Select Therapist</option> 
         {appointment.availableTherapist.map((therapist) => (
-          <option key={therapist._id} value={therapist._id}>
-          {therapist.therapist_name}
-      </option>
+          <option key={therapist.id} value={therapist.id}>
+            {therapist.therapist_name}
+          </option>
         ))}
       </select>
     ) : (
