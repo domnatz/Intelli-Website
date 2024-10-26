@@ -1009,11 +1009,8 @@ app.get('/api/therapists-avail', async (req, res) => {
   try {
     let { selectedSchedule, selectedDate } = req.query;
 
-
     console.log('Received selectedDate:', selectedDate);
     console.log('Received selectedSchedule:', selectedSchedule);
-
-
 
 
     if (!selectedSchedule || !selectedDate) {
@@ -1021,15 +1018,12 @@ app.get('/api/therapists-avail', async (req, res) => {
       return res.status(400).json({ error: 'Missing schedule or date' });
     }
 
-
     // Convert selectedDate to a Date object and set it to midnight UTC
     const selectedDateObj = new Date(selectedDate);
     selectedDateObj.setUTCHours(0, 0, 0, 0);
 
-
     // Fetch therapists and populate their schedules
     const therapists = await Therapist.find().populate('schedule');
-
 
     // Extract start and end times from selectedSchedule
     let startTimeStr, endTimeStr;
@@ -1041,12 +1035,10 @@ app.get('/api/therapists-avail', async (req, res) => {
       return res.status(400).json({ error: 'Invalid time range format' });
     }
 
-
     const [startHour, startMinute] = startTimeStr.split(':').map(Number);
     const [endHour, endMinute] = endTimeStr.split(':').map(Number);
     const startTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute);
     const endTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute);
-
 
     console.log('Fetched therapists (before filtering):', therapists);
     // Filter therapists
@@ -1054,7 +1046,6 @@ app.get('/api/therapists-avail', async (req, res) => {
       if (!therapist.schedule || !Array.isArray(therapist.schedule)) {
         return false;
       }
-
 
       return therapist.schedule.some(therapistSchedule => {
         // Check for valid schedule entry and Date objects
@@ -1080,24 +1071,13 @@ app.get('/api/therapists-avail', async (req, res) => {
                             scheduleStartTime.getMonth() === selectedDateObj.getMonth() &&
                             scheduleStartTime.getFullYear() === selectedDateObj.getFullYear();
 
-
         return isScheduleMatch && isDateMatch;
       });
     });
 
-
-
-
     console.log('Available therapists:', availableTherapists);
 
-
-
-
     res.json(availableTherapists);
-
-
-
-
   } catch (error) {
     console.error('Error fetching therapists:', error);
     if (!res.headersSent) {
@@ -1105,6 +1085,7 @@ app.get('/api/therapists-avail', async (req, res) => {
     }
   }
 });
+
 
 // Route to handle creating new schedules
 app.post('/api/schedules', async (req, res) => {
