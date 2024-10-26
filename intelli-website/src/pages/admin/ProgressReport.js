@@ -466,13 +466,16 @@ export default function PatientInfoForm() {
         setTimeout(() => {
           setShowAssignAlert(false);
         }, 3000);
+
+        // Fetch updated patient data
+        const updatedPatientData = await fetchPatient();
+        setPatient(updatedPatientData);
       } else {
         console.error("Error assigning lesson:", response.status);
       }
     } catch (error) {
       console.error("Error assigning lesson:", error);
     }
-    console.log('Progress Score:', progressScore);
   };
 
   return (
@@ -576,9 +579,8 @@ export default function PatientInfoForm() {
     <FormControlLabel value="true" control={<Radio />} label="Yes" />
     <FormControlLabel value="false" control={<Radio />} label="No" />
   </RadioGroup>   
-
 </FormControl>
-<br/>
+
 {/* Lesson Engagement */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
   <FormLabel component="legend">Lesson Engagement:</FormLabel>
