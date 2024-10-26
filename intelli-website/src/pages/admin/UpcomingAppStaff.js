@@ -111,23 +111,13 @@ const handleConfirmAppointment = async (appointmentId) => {
     );
 
     if (response.ok) {
-      const updatedAppointment = await response.json(); 
-
-      // Update the appointments state using the updated data from the server
-      setAppointments((prevAppointments) => {
-        const updatedAppointments = prevAppointments.map(
-          (appointment) =>
-            appointment._id === appointmentId
-              ? updatedAppointment // Use the updated appointment from the server
-              : appointment
-        );
-        return updatedAppointments;
-      });
+      // Instead of just logging, fetch all appointments again
+      fetchAppointments(); 
 
       alert("Appointment confirmed!");
     } else {
-      // Handle error (e.g., display an error message)
-      try {
+       // Handle error (e.g., display an error message)
+       try {
         const errorData = await response.json();
         console.error(
           "Error confirming appointment:",
@@ -148,9 +138,6 @@ const handleConfirmAppointment = async (appointmentId) => {
     console.error("Error confirming appointment:", error);
     alert("Network error. Please check your connection.");
   }
-  console.log("Confirm button clicked!");
-console.log("Appointment ID:", appointmentId);
-console.log("Therapist ID:", therapistId);
 };
 
     const handleDeleteAppointment = async (appointmentId) => {
