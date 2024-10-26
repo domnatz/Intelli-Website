@@ -1042,7 +1042,9 @@ app.get('/api/therapists-avail', async (req, res) => {
     console.log('Received selectedDate:', selectedDate);
     console.log('Received selectedSchedule:', selectedSchedule);
 
+
     if (!selectedSchedule || !selectedDate) {
+      // Handle missing parameters explicitly
       return res.status(400).json({ error: 'Missing schedule or date' });
     }
 
@@ -1058,25 +1060,25 @@ app.get('/api/therapists-avail', async (req, res) => {
     if (typeof selectedSchedule === 'string' && selectedSchedule.includes(' - ')) {
       [startTimeStr, endTimeStr] = selectedSchedule.split(' - ');
     } else {
+      // If the format is not as expected, log an error and return an error response
       console.error('Unexpected selectedSchedule format:', selectedSchedule);
       return res.status(400).json({ error: 'Invalid time range format' });
     }
 
     const [startHour, startMinute] = startTimeStr.split(':').map(Number);
     const [endHour, endMinute] = endTimeStr.split(':').map(Number);
-
-    // Explicitly use Date.UTC to create startTime and endTime in UTC
-    const startTime = new Date(Date.UTC(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute));
-    const endTime = new Date(Date.UTC(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute)); 
+    const startTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute);
+    const endTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute);
 
     console.log('Fetched therapists (before filtering):', therapists);
-
+    // Filter therapists
     const availableTherapists = therapists.filter(therapist => {
       if (!therapist.schedule || !Array.isArray(therapist.schedule)) {
         return false;
       }
 
       return therapist.schedule.some(therapistSchedule => {
+        // Check for valid schedule entry and Date objects
         if (
           !therapistSchedule ||
           !therapistSchedule.start_time ||
@@ -1087,33 +1089,23 @@ app.get('/api/therapists-avail', async (req, res) => {
           return false;
         }
 
-        // Adjust scheduleStartTime to account for the time zone offset
-        const scheduleStartTime = new Date(therapistSchedule.start_time); 
+
+        const scheduleStartTime = new Date(therapistSchedule.start_time);
         const scheduleEndTime = new Date(therapistSchedule.end_time);
-
-        // Detailed logging for debugging
-        console.log("Start Time:", startTime);
-        console.log("End Time:", endTime);
-        console.log("Schedule Start Time:", scheduleStartTime);
-        console.log("Schedule End Time:", scheduleEndTime);
-
         const isScheduleMatch = scheduleStartTime.getTime() <= endTime.getTime() &&
-          scheduleEndTime.getTime() >= startTime.getTime();
+                                 scheduleEndTime.getTime() >= startTime.getTime();
 
-        const isDateMatch = 
-            scheduleStartTime.getUTCFullYear() === selectedDateObj.getUTCFullYear() &&
-            scheduleStartTime.getUTCMonth() === selectedDateObj.getUTCMonth() &&
-            scheduleStartTime.getUTCDate() === selectedDateObj.getUTCDate(); 
 
-        console.log("Is Schedule Match:", isScheduleMatch);
-        console.log("Is Date Match:", isDateMatch);
+        // Check if the schedule's date matches the selected date
+        const isDateMatch = scheduleStartTime.getDate() === selectedDateObj.getDate() &&
+                            scheduleStartTime.getMonth() === selectedDateObj.getMonth() &&
+                            scheduleStartTime.getFullYear() === selectedDateObj.getFullYear();
 
         return isScheduleMatch && isDateMatch;
       });
     });
 
     console.log('Available therapists:', availableTherapists);
-    console.log("Time zone offset:", new Date().getTimezoneOffset());
 
     res.json(availableTherapists);
   } catch (error) {
@@ -1123,6 +1115,7 @@ app.get('/api/therapists-avail', async (req, res) => {
     }
   }
 });
+
 // Catch-all route to serve the index.html for client-side routing (for production)
 app.use((req, res, next) => {
   console.log(`Incoming request: ${req.method} ${req.url}`);
