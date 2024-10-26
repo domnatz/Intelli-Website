@@ -1078,6 +1078,7 @@ app.get('/api/therapists-avail', async (req, res) => {
     console.log('Available therapists:', availableTherapists);
 
     res.json(availableTherapists);
+console.log('Response headers for /api/therapists-avail:', res.getHeaders());
   } catch (error) {
     console.error('Error fetching therapists:', error);
     if (!res.headersSent) {
