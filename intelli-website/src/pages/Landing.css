@@ -453,7 +453,17 @@ p{
   }
 
   .apt-btn {
-    margin-top: 10px;
-    width: 100%;
+    width: 220px;
+    height: 50px;
+    padding: 5px;
+    background: #2D848B;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom:40px;
+    margin-left: 10px;
   }
 }
