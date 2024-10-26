@@ -1064,8 +1064,10 @@ app.get('/api/therapists-avail', async (req, res) => {
 
     const [startHour, startMinute] = startTimeStr.split(':').map(Number);
     const [endHour, endMinute] = endTimeStr.split(':').map(Number);
-    const startTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute);
-    const endTime = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute);
+
+    // Explicitly use Date.UTC to create startTime and endTime in UTC
+    const startTime = new Date(Date.UTC(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), startHour, startMinute));
+    const endTime = new Date(Date.UTC(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), selectedDateObj.getDate(), endHour, endMinute)); 
 
     console.log('Fetched therapists (before filtering):', therapists);
 
@@ -1097,9 +1099,11 @@ app.get('/api/therapists-avail', async (req, res) => {
         const isScheduleMatch = scheduleStartTime.getTime() <= endTime.getTime() &&
           scheduleEndTime.getTime() >= startTime.getTime();
 
-        const isDateMatch = scheduleStartTime.getDate() === selectedDateObj.getDate() &&
-          scheduleStartTime.getMonth() === selectedDateObj.getMonth() &&
-          scheduleStartTime.getFullYear() === selectedDateObj.getFullYear();
+        // Direct date comparison using UTC methods
+        const isDateMatch = 
+            scheduleStartTime.getUTCFullYear() === selectedDateObj.getUTCFullYear() &&
+            scheduleStartTime.getUTCMonth() === selectedDateObj.getUTCMonth() &&
+            scheduleStartTime.getUTCDate() === selectedDateObj.getUTCDate(); 
 
         console.log("Is Schedule Match:", isScheduleMatch);
         console.log("Is Date Match:", isDateMatch);
