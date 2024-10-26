@@ -233,7 +233,7 @@ export default function PatientInfoForm() {
   const [recommendations, setRecommendations] = useState([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(true);
   const [lessonCompletion, setLessonCompletion] = useState('');
-
+  const [showSubmitAlert, setShowSubmitAlert] = useState(false);
  // Fetch progress score when the component mounts
  useEffect(() => {
   const fetchProgressScore = async () => {
@@ -401,9 +401,22 @@ export default function PatientInfoForm() {
         });
 
         if (response.ok) {
-            console.log("Progress updated successfully!");
-            // Optional: Reset form fields, or show a success message to the user
-            // e.g., resetForm(), setShowSuccess(true)
+             // Show success alert
+      setShowSubmitAlert(true);
+
+      // Clear form fields
+      setSelfAware(null);
+      setLessonEngagement(null);
+      setImprovementState(null);
+      setErrorFrequency(null);
+      setProgressQuality(null);
+      setRemarks("");
+      setSelectedFile(null);
+
+      // Hide alert after 3 seconds
+      setTimeout(() => {
+        setShowSubmitAlert(false);
+      }, 3000);
         } else {
             console.error("Error updating progress:", response.status);
             // Optional: Display an error message to the user
@@ -481,6 +494,13 @@ export default function PatientInfoForm() {
               Lesson assigned successfully!
             </Alert>
           )}
+
+          {/* Alert for Submit Progress Success */}
+        {showSubmitAlert && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            Progress submitted successfully!
+          </Alert>
+        )}
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <Box
@@ -558,7 +578,7 @@ export default function PatientInfoForm() {
   </RadioGroup>   
 
 </FormControl>
-
+<br/>
 {/* Lesson Engagement */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
   <FormLabel component="legend">Lesson Engagement:</FormLabel>
@@ -568,7 +588,7 @@ export default function PatientInfoForm() {
     <FormControlLabel value="low" control={<Radio />} label="Low" />
   </RadioGroup>
 </FormControl>   
-
+<br/>
 
 {/* Improvement State */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
@@ -579,7 +599,7 @@ export default function PatientInfoForm() {
     <FormControlLabel value="not improving" control={<Radio />} label="Not improving" />
   </RadioGroup>
 </FormControl>
-
+<br/>
 {/* Error Frequency */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
   <FormLabel component="legend">Error Frequency:</FormLabel>
@@ -589,7 +609,7 @@ export default function PatientInfoForm() {
     <FormControlLabel value="always" control={<Radio />} label="always" />
   </RadioGroup>
 </FormControl>
-
+<br/>
 {/* Progress Quality */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
   <FormLabel component="legend">Progress Quality:</FormLabel>
@@ -600,7 +620,7 @@ export default function PatientInfoForm() {
  control={<Radio />} label="Poor" />
   </RadioGroup>
 </FormControl>
-
+<br/>
            <Box
       sx={{
         border: "1px dashed #ccc",
@@ -636,7 +656,6 @@ export default function PatientInfoForm() {
   value={remarks || ""}
   onChange={(e) => setRemarks(e.target.value)}
 />
-
               {/* Lesson Completion Section */}
               <Box
   sx={{
