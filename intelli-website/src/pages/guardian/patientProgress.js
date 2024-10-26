@@ -26,8 +26,7 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
   const [error, setError] = useState(null);
   const [currentPatient, setCurrentPatient] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [drawerOpen, setDrawerOpen] = useState(false); 
-
+  const [drawerOpen, setDrawerOpen] = useState(false); {/*New*/}
   useEffect(() => {
     const fetchPatients = async () => {
       setIsLoading(true);
@@ -151,14 +150,15 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
           "Content-Type": "application/json",
         },
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to fetch lessons");
       }
-
+  
       const data = await response.json();
-      setLessons(data);
+      // Ensure the API response includes complexity, category, and description
+      setLessons(data); 
     } catch (error) {
       console.error("Error fetching lessons:", error);
       setError(error.message);
@@ -188,18 +188,20 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
       // Programmatically trigger a click on the link to start the download
       document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+      document.body.removeChild(link);   
+  
   
     } catch (error) {
-      console.error("Error downloading report:", error);
+      console.error("Error downloading report:",   
+   error);
       setError(error.message);
     }
   };
-  
+
   const toggleDrawer = (open) => {
     setDrawerOpen(open);
   }; {/*New*/}
-  
+
   const fetchProgressReports = async (patientId) => {
     try {
       const url = `${process.env.REACT_BACKEND_API}/api/patients/${patientId}/progress`;
@@ -338,23 +340,31 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
                     </div>
 
                     <div className="patient-lessons">
-                      <h3>Current Lessons </h3>
-                      {lessons.map((lesson) => ( 
-                        <div key={lesson._id}> 
-                          <p>Lesson Name: {lesson.lesson_name}</p>
-                          <p>Complexity: {lesson.complexity}</p>
-                          <p>Category: {lesson.category}</p>
-                          <p>Description: {lesson.description}</p>
-                        </div>
-                      ))}
+                      <h3>Current Lessons</h3>
+                      {lessons.length > 0 ? ( // Check if there are any lessons
+                        lessons.map((lesson) => (
+                          <div key={lesson._id}>
+                            <p>Lesson Name: {lesson.lesson_name}</p>
+                            <p>Complexity: {lesson.lesson_complexity}</p>
+                            <p>Category: {lesson.lesson_category}</p>
+                            <p>Description: {lesson.lesson_desc}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p>No lessons assigned to this patient yet.</p>
+                      )}
                     </div>
                   </div>
-
+                  
                   <div className="reports-remarks">
-                    <div className="report-file">
-                    <p> Report File </p>
-                      <button>Show Full Report</button>
-                    </div>
+                  <div className="report-file">
+  <p> Report File </p>
+  {progressReports.map((progress) => (
+    <div key={progress._id} onClick={() => handleDownloadReport(patients[currentPatient]._id, progress._id)} style={{ cursor: 'pointer' }}>
+      Download Report {/* Or display the filename if available */}
+    </div>
+  ))}
+</div>
 
                     <div className="remarks">
                         <h3> Remarks from the Therapist: </h3>
