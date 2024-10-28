@@ -318,7 +318,7 @@ const submitAssessmentData = async (patientData) => {
 return (
   <div className="Appointment-pg-cnt">
    <div  className="Appointment-pg-cnt"> {/*New*/}
-    <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000, height: 85}}>
+    <AppBar position="fixed" sx={{ backgroundColor: '#94C5B5', zIndex: 1000, height: 90 }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <img className="Logo" src={logo} alt="Logo" style={{ marginRight: 'px', width: '70px', height: '60px' }} />
@@ -335,7 +335,6 @@ return (
             Logout
           </button>
         </Box>
-
         <IconButton
       color="inherit"
       edge="end"
