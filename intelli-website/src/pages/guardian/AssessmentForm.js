@@ -126,16 +126,16 @@ const AssessmentForm = ({ onSubmit }) => {
 
   return (
     <Box
-      sx={{
-        padding: '20px',
-        backgroundColor: '#FDF3EB',
-        border: '2px solid #C6C6C6',
-        borderRadius: '10px',
-        maxWidth: '800px',
-        margin: 'auto',
-      }}
+    sx={{
+      padding: '20px',
+          backgroundColor: '#FDF3EB',
+          border: '2px solid #C6C6C6',
+          borderRadius: '10px',
+          width: '94%', //CHANGED
+          margin: 'auto',
+    }}
     >
-      <Typography variant="h5" gutterBottom sx={{ fontStyle: 'italic', marginBottom: '20px', color: '#3F4662' }}>
+     <Typography variant="h4" gutterBottom sx={{ marginBottom: '20px', color: '#2d848b', fontWeight: 'Bolder' }}>
         Child Case History form - For Initial Evaluation (SLP Focus)
       </Typography>
       <Typography variant="body2" gutterBottom sx={{ fontStyle: 'italic', marginBottom: '20px' }}>

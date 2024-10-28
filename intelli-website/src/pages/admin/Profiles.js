@@ -50,7 +50,7 @@ export default function PatientList() {
           {patients.map((patient) => (
             <Grid item key={patient._id} xs={12} sm={6} md={3}> 
               <Link to={`/ProgressReport/${patient._id}`} style={{ textDecoration: 'none' }}> 
-                <Card sx={{ p: 2, boxShadow: 3 }}>
+                <Card sx={{ p: 2, boxShadow: 3, display: 'flex', flexDirection: 'column', height: 160 }}>
                   <CardHeader
                     avatar={
                       <Avatar sx={{ backgroundColor: '#d3d3d3' }}>

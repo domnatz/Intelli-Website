@@ -466,7 +466,6 @@ export default function PatientInfoForm() {
         setTimeout(() => {
           setShowAssignAlert(false);
         }, 3000);
-
         // Fetch updated patient data
         const updatedPatient = await fetch(`${process.env.REACT_BACKEND_API}/api/patients/${patientId}`);
         const updatedPatientData = await updatedPatient.json();
