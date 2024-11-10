@@ -358,20 +358,22 @@ export default function ChildProgress({ isLoggedIn, onLogout }) {
                   
                   <div className="reports-remarks">
                   <div className="report-file">
-  <p> Report File </p>
+                  <p> Report File </p>
+{progressReports.map((progress, index) => (
+  <div key={progress._id} onClick={() => handleDownloadReport(patients[currentPatient]._id, progress._id)} style={{ cursor: 'pointer' }}>
+    {`${index + 1}. ${progress.report_file.filename || "Download Report"}`} {/* Display the filename with numbering */}
+  </div>
+))}
+</div>
+<div className="remarks">
+  <h3> Remarks from the Therapist: </h3>
   {progressReports.map((progress) => (
-    <div key={progress._id} onClick={() => handleDownloadReport(patients[currentPatient]._id, progress._id)} style={{ cursor: 'pointer' }}>
-      Download Report {/* Or display the filename if available */}
+    <div key={progress._id}>
+      <p>{progress.remarks}</p>
+      <p><small>{new Date(progress.createdAt).toLocaleString()}</small></p> {/* Display the timestamp */}
     </div>
   ))}
 </div>
-
-                    <div className="remarks">
-                        <h3> Remarks from the Therapist: </h3>
-                        {progressReports.map((progress) => ( 
-                          <p>{progress.remarks}</p> 
-                        ))}
-                    </div>
                   </div>
 
                   <div className="patient-navigation">
