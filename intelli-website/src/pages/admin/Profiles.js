@@ -58,7 +58,7 @@ export default function PatientList() {
                       </Avatar>
                     }
                     title={
-                      <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#3F4662'}}>
                         {patient.patient_name} {/* Assuming your patient data has a patient_name field */}
                       </Typography>
                     }

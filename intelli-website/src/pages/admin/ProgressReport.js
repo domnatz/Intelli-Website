@@ -517,9 +517,15 @@ export default function PatientInfoForm() {
                 boxShadow: 3,
               }}
             >
-              <Typography>Patient Name: {patient.patient_name}</Typography>
-              <Typography>Age: {patient.patient_age}</Typography>
-              <Typography>Gender: {patient.patient_sex}</Typography>
+              <Typography>
+  <span style={{ fontWeight: 'bold' }}>Patient Name:</span> {patient.patient_name}
+</Typography>
+<Typography>
+  <span style={{ fontWeight: 'bold' }}>Age:</span> {patient.patient_age}
+</Typography>
+<Typography>
+  <span style={{ fontWeight: 'bold' }}>Gender:</span> {patient.patient_sex}
+</Typography>
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
@@ -537,10 +543,18 @@ export default function PatientInfoForm() {
 {patient.assignedLessons.map((lesson) => (
   <div key={lesson._id} style={{ display: 'flex', alignItems: 'center' }}>
     <div> {/* Wrap the lesson details in a div */}
-      <Typography>Lesson Name: {lesson.lesson_name}</Typography>
-      <Typography>Lesson Complexity: {lesson.lesson_complexity}</Typography>
-      <Typography>Lesson Category: {lesson.lesson_category}</Typography>
-      <Typography>Lesson Description: {lesson.lesson_desc}</Typography>
+      <Typography>
+  <span style={{ fontWeight: 'bold' }}>Lesson Name:</span> {lesson.lesson_name}
+</Typography>
+<Typography>
+  <span style={{ fontWeight: 'bold' }}>Lesson Complexity:</span> {lesson.lesson_complexity}
+</Typography>
+<Typography>
+  <span style={{ fontWeight: 'bold' }}>Lesson Category:</span> {lesson.lesson_category}
+</Typography>
+<Typography>
+  <span style={{ fontWeight: 'bold' }}>Lesson Description:</span> {lesson.lesson_desc}
+</Typography>
     </div>
     <Button
       variant="contained"
@@ -580,7 +594,7 @@ export default function PatientInfoForm() {
     <FormControlLabel value="false" control={<Radio />} label="No" />
   </RadioGroup>   
 </FormControl>
-
+<br />
 {/* Lesson Engagement */}
 <FormControl component="fieldset" sx={{ marginTop: "18px" }}>
   <FormLabel component="legend">Lesson Engagement:</FormLabel>
