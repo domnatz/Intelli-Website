@@ -518,7 +518,7 @@ const AssessmentForm = ({ onSubmit }) => {
             A. Motor Milestones
           </Typography>
           <Typography sx={{ textAlign: 'left' }}>
-            Please write the age or approximate age at which the following skills were FIRST observed:
+            Please write the age or approximate age <b>(in Months)</b> at which the following skills were <b>FIRST</b>observed:
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', margin: '16px' }}>
             <TextField
@@ -665,7 +665,7 @@ const AssessmentForm = ({ onSubmit }) => {
                         />
                         <TextField
                           required
-                          label="Age"
+                          label="Age (Months)"
                           variant="outlined"
                           value={patientData.sle_motor_skills.first_word_age}
                           onChange={(e) => handleCheckboxChange('sle_motor_skills', 'first_word_age', e.target.value)}
@@ -692,7 +692,7 @@ const AssessmentForm = ({ onSubmit }) => {
                         />
                         <TextField
                           required
-                          label="Age"
+                          label="Age (Months)"
                           variant="outlined"
                           value={patientData.sle_motor_skills.understood_50_words_age}
                           onChange={(e) => handleCheckboxChange('sle_motor_skills', 'understood_50_words_age', e.target.value)}
@@ -734,7 +734,7 @@ const AssessmentForm = ({ onSubmit }) => {
                 
                         <TextField
                           required
-                          label="Age"
+                          label="Age (Months)"
                           variant="outlined"
                           value={patientData.sle_motor_skills.expressed_50_words_age}
                           onChange={(e) => handleCheckboxChange('sle_motor_skills', 'expressed_50_words_age', e.target.value)}
