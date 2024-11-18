@@ -54,7 +54,7 @@ const MonthlyReport = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden',  }}>
+    <Box sx={{ display: 'flex', width: '100vw', height: '100vh', overflow: 'hidden' }}>
       {/* Conditionally render Sidebar for larger screens */}
       isMobile && <Sidebar />
 
@@ -73,7 +73,7 @@ const MonthlyReport = () => {
           boxSizing: 'border-box',
         }}
       >
-        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 0.5, color: '#3F4662', marginTop: 10 }} >
+        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 0.5, color: '#3F4662', mt: 0, mb: 0 }} >
           Monthly Patients
         </Typography>
 
@@ -83,8 +83,8 @@ const MonthlyReport = () => {
               sx={{
                 height: isMobile ? 300 : 500,
                 width: '100%',
-                margin: 0, // Remove margin
-                padding: 0, // Remove padding
+                m: 0, // Remove margin
+                p: 0, // Remove padding
                 boxShadow: 3,
                 borderRadius: 2,
                 backgroundColor: theme.palette.background.paper,
