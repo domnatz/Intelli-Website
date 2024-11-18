@@ -64,7 +64,6 @@ const MonthlyReport = () => {
         sx={{
           flexGrow: 1,
           p: 3,
-          mt: 1, // Margin for header spacing
           width: { xs: '100%', md: 'calc(100% - 280px)' },
           ml: '210px',
           overflowY: 'auto',
@@ -74,7 +73,7 @@ const MonthlyReport = () => {
           boxSizing: 'border-box',
         }}
       >
-        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 3, color: '#3F4662', marginTop: 10 }} >
+        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 0.5, color: '#3F4662', marginTop: 10 }} >
           Monthly Patients
         </Typography>
 
