@@ -98,6 +98,7 @@ const MonthlyReport = () => {
                         boxShadow: 3,
                         borderRadius: 2,
                         backgroundColor: theme.palette.background.paper,
+                        paddingTop: 4,
                       }}
                     >
                       <Line data={data} options={options} />
