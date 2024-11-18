@@ -36,6 +36,13 @@ const AssessmentFormTwo = ({ onSubmit }) => { // Receive onSubmit as a prop
         }
     });
 
+    const isSexSelected = () => {
+      return patientData.patient_sex === 'Male' || patientData.patient_sex === 'Female'; // Add "Other" if applicable
+    };
+  
+    const [sexError, setSexError] = useState(false); // Add state for error
+  
+    // Handle form submission
     // Handle changes for patient data
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
@@ -59,6 +66,13 @@ const AssessmentFormTwo = ({ onSubmit }) => { // Receive onSubmit as a prop
     // Handle form submission
 const handleSubmit = (event) => {
     event.preventDefault();
+
+    if (!isSexSelected()) {
+      setSexError(true); // Show error message
+      return;
+    } else {
+      setSexError(false); // Hide error message if a sex is selected
+    }
 
     // Data type conversions and validation
     const updatedPatientData = {
@@ -206,6 +220,12 @@ const handleSubmit = (event) => {
               />
               {/* Add "Other" option if needed */}
             </Box>
+            
+            {sexError && ( // Conditionally render the error message
+          <Typography variant="caption" color="error" sx={{ display: 'block', marginTop: '-8px' }}>
+            Please fill out this field.
+          </Typography>
+        )}
     
     
             <Box

@@ -64,6 +64,7 @@ const AssessmentForm = ({ onSubmit }) => {
     
   });
 
+  const [sexError, setSexError] = useState(false);
 
   // Handle changes for child's sex
   const handleSexChange = (event) => {
@@ -89,11 +90,20 @@ const AssessmentForm = ({ onSubmit }) => {
     }));
   };
 
+  const isSexSelected = () => {
+    return patientData.patient_sex === 'Male' || patientData.patient_sex === 'Female'; // Add "Other" if applicable
+  };
+
   // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
     // Here you would typically send the patientData to your backend for saving.
-    console.log(patientData);
+    if (!isSexSelected()) {
+      setSexError(true); // Show error message
+      return;
+    } else {
+      setSexError(false); // Hide error message if a sex is selected
+    }
     onSubmit(patientData); 
      // Data type conversions and validation
      const updatedPatientData = {
@@ -116,7 +126,6 @@ const AssessmentForm = ({ onSubmit }) => {
   
   };
   
-
   const handleAddSibling = () => {
     setPatientData(prevData => ({
       ...prevData,
@@ -262,7 +271,11 @@ const AssessmentForm = ({ onSubmit }) => {
           />
           {/* Add Checkbox for "Other" if needed */}
         </Box>
-
+        {sexError && ( 
+  <Typography variant="caption" color="error" sx={{ display: 'block', marginTop: '-8px' }}>
+    Please fill out this field.
+  </Typography>
+)}
         <Box
           sx={{
             display: 'flex',
@@ -518,7 +531,7 @@ const AssessmentForm = ({ onSubmit }) => {
             A. Motor Milestones
           </Typography>
           <Typography sx={{ textAlign: 'left' }}>
-            Please write the age or approximate age at which the following skills were FIRST observed:
+            Please write the age or approximate age (in Months) at which the following skills were FIRST observed:
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', margin: '16px' }}>
             <TextField
@@ -557,7 +570,7 @@ const AssessmentForm = ({ onSubmit }) => {
               onChange={(e) => handleCheckboxChange('sle_motor_skills', 'walked_unaided_age', e.target.value)}
               sx={{
                 width: '20%',
-                backgroundColor:'FFFFFF',
+                backgroundColor:'#FFFFFF',
                 marginRight: '20px',
                 borderRadius: '20px',
                 '& .MuiOutlinedInput-root': { borderRadius: '20px' },

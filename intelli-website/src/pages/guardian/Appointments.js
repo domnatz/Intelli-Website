@@ -87,6 +87,11 @@ const [errorMessage, setErrorMessage] = useState('');
     console.log("therapyType received in Appointments:", therapyType); 
 }, [therapyType]); 
 
+const [snackbarPosition, setSnackbarPosition] = useState({
+  vertical: 'top',
+  horizontal: 'center',
+});
+
 const handleTimeSelection = (time) => {
   if (!selectedDate) {
     setError('Please select a date first.'); // Set an error message
@@ -406,13 +411,25 @@ return (
   </div> {/*New*/}
 
     <main>
-    <Snackbar open={alertOpen} autoHideDuration={6000} onClose={() => setAlertOpen(false)}>
+    <Snackbar
+  open={alertOpen}
+  autoHideDuration={6000}
+  onClose={() => setAlertOpen(false)}
+  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+  sx={{ position: 'fixed', top: 0, zIndex: 1400 }}
+>
   <Alert onClose={() => setAlertOpen(false)} severity="success" sx={{ width: '100%' }}>
     Appointment created successfully!
   </Alert>
 </Snackbar>
 
-<Snackbar open={errorAlertOpen} autoHideDuration={6000} onClose={() => setErrorAlertOpen(false)}>
+<Snackbar
+  open={errorAlertOpen}
+  autoHideDuration={6000}
+  onClose={() => setErrorAlertOpen(false)}
+  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+  sx={{ position: 'fixed', top: 0, zIndex: 1400 }}
+>
   <Alert onClose={() => setErrorAlertOpen(false)} severity="error" sx={{ width: '100%' }}>
     {errorMessage}
   </Alert>
