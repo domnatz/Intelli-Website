@@ -557,7 +557,7 @@ const AssessmentForm = ({ onSubmit }) => {
               onChange={(e) => handleCheckboxChange('sle_motor_skills', 'walked_unaided_age', e.target.value)}
               sx={{
                 width: '20%',
-                backgroundColor:'FFFFFF',
+                backgroundColor:'#FFFFFF',
                 marginRight: '20px',
                 borderRadius: '20px',
                 '& .MuiOutlinedInput-root': { borderRadius: '20px' },
