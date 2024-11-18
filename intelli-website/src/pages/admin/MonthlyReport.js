@@ -74,7 +74,7 @@ const MonthlyReport = () => {
           boxSizing: 'border-box',
         }}
       >
-        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 3, color: '#3F4662', marginBottom: 2, marginTop: 25 }} >
+        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 3, color: '#3F4662', marginTop: 10 }} >
           Monthly Patients
         </Typography>
 
