@@ -87,7 +87,7 @@ const MonthlyReport = () => {
                   Monthly Patients
                 </Typography>
                 
-                <Grid container justifyContent="center" alignItems="center" sx={{ flexGrow: 1, mt: 1 }}>
+                <Grid container justifyContent="center" alignItems="center" sx={{ flexGrow: 1}}>
                   <Grid item xs={12} md={11}>
                     <Box
                       sx={{
