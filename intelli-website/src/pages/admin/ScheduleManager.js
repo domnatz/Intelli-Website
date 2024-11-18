@@ -281,44 +281,45 @@ useEffect(() => {
     }
   };
 
-  const handleDeleteTherapist = async (event) => {
-    event.preventDefault();
-    
-    const therapistId = deleteTherapist;
-
-    if (
-      window.confirm(
-        "Are you sure you want to delete this therapist? This action cannot be undone."
-      )
-    ) {
-      try {
-        
-        const response = await fetch(
-          `${process.env.REACT_BACKEND_API}/api/therapists/${therapistId}`,
-          {
-            method: "DELETE",
+    const handleDeleteTherapist = async (event) => {
+      event.preventDefault();
+      
+      const therapistId = deleteTherapist;
+  
+      if (
+        window.confirm(
+          "Are you sure you want to delete this therapist? This action cannot be undone."
+        )
+      ) {
+        try {
+          
+          const response = await fetch(
+            `${process.env.REACT_BACKEND_API}/api/therapists/${therapistId}`,
+            {
+              method: "DELETE",
+            }
+          );
+  
+          if (response.ok) {
+            // Update the therapists state to remove the deleted therapist
+            setTherapists((prevTherapists) =>
+              prevTherapists.filter((therapist) => therapist._id !== therapistId)
+            );
+            setSuccessMessage('Therapist deleted successfully!');
+            handleDeleteModalClose(); // Close the modal
+          } else {
+            // Handle error (e.g., display an error message)
+            const errorData = await response.json();
+            console.error(
+              "Error deleting therapist:",
+              errorData.error || response.statusText
+            );
           }
-        );
-
-        if (response.ok) {
-          // Update the therapists state to remove the deleted therapist
-          setTherapists((prevTherapists) =>
-            prevTherapists.filter((therapist) => therapist._id !== therapistId)
-          );
-          setSuccessMessage('Therapist deleted successfully!'); 
-        } else {
-          // Handle error (e.g., display an error message)
-          const errorData = await response.json();
-          console.error(
-            "Error deleting therapist:",
-            errorData.error || response.statusText
-          );
+        } catch (error) {
+          console.error("Error deleting therapist:", error);
         }
-      } catch (error) {
-        console.error("Error deleting therapist:", error);
       }
-    }
-  };
+    };
 
 
   return (

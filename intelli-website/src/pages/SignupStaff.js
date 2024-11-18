@@ -201,10 +201,6 @@ export default function StaffRegistrationPage() {
                     <button type="submit" disabled={isLoading}>
                         {isLoading ? "Signing up..." : "SIGNUP"}
                     </button>
-                    <p className="login-link">
-                        Already have an account?{" "}
-                        <Link to="/login">Login</Link>
-                    </p>
                 </form>
             </div>
             <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>

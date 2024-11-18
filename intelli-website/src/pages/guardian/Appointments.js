@@ -561,7 +561,7 @@ return (
           <div>
           <h3 className="ConfirmInfo">Are you sure you want to confirm this appointment?</h3> {/*New*/}
 
-            <button onClick={handleSubmitAppointment} className="Confirm-btn">Confirm Appointment</button> {/*New*/}
+            <button onClick={handleSubmitAppointment} className="Confirm-btn">Yes</button> {/*New*/}
           </div>
         </AccordionDetails>
       </CustomAccordion>

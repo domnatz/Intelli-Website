@@ -1,11 +1,11 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement, Tooltip } from 'chart.js';
 import { Grid, Box, Container, Typography, useTheme, useMediaQuery } from '@mui/material';
 import Sidebar from './Sidebar';
 
 // Register ChartJS modules
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip);
 
 const MonthlyReport = () => {
   const theme = useTheme();
@@ -13,7 +13,6 @@ const MonthlyReport = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down('md')); // Detect tablet screens
 
   // Sample data - Replace with real data if necessary
-  const appointmentsData = [30, 25, 40, 55, 35, 60, 70, 80, 65, 50, 75, 90];
   const patientsData = [20, 30, 25, 45, 55, 35, 50, 70, 65, 40, 85, 100];
 
   // Chart data configuration
@@ -23,13 +22,6 @@ const MonthlyReport = () => {
       'July', 'August', 'September', 'October', 'November', 'December'
     ],
     datasets: [
-      {
-        label: 'Appointments',
-        data: appointmentsData,
-        borderColor: 'rgba(75,192,192,1)',
-        tension: 0.4,
-        pointBackgroundColor: 'rgba(75,192,192,1)',
-      },
       {
         label: 'Patients',
         data: patientsData,
@@ -46,7 +38,7 @@ const MonthlyReport = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: isMobile ? 'top' : 'right',
+        display: false,
       },
     },
     scales: {
@@ -83,7 +75,7 @@ const MonthlyReport = () => {
         }}
       >
         <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 3, color: '#3F4662', marginBottom: 2 }} >
-          Monthly Appointments and Patients
+          Monthly Patients
         </Typography>
 
         <Grid container justifyContent="center" alignItems="center" sx={{ flexGrow: 1 }}>
