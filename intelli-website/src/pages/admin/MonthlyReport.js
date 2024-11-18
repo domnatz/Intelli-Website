@@ -79,7 +79,7 @@ const MonthlyReport = () => {
                   align="center" 
                   sx={{ 
                     fontWeight: 'bold', 
-                    mb: 1, // Adjust margin bottom
+                    mb: 0, // Adjust margin bottom
                     color: '#3F4662', 
                     mt: 5 // Add margin top
                   }} 
