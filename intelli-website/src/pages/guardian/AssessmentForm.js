@@ -518,7 +518,7 @@ const AssessmentForm = ({ onSubmit }) => {
             A. Motor Milestones
           </Typography>
           <Typography sx={{ textAlign: 'left' }}>
-            Please write the age or approximate age <b>(in Months)</b> at which the following skills were <b>FIRST</b>observed:
+            Please write the age or approximate age <b>(in Months)</b> at which the following skills were <b>FIRST</b> observed:
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', margin: '16px' }}>
             <TextField
