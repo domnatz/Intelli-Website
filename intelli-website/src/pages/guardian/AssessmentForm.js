@@ -93,7 +93,11 @@ const AssessmentForm = ({ onSubmit }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Here you would typically send the patientData to your backend for saving.
-    console.log(patientData);
+    // Check if patient_sex is selected
+    if (!patientData.patient_sex) {
+      alert("Please select the patient's sex.");
+      return;
+    }
     onSubmit(patientData); 
      // Data type conversions and validation
      const updatedPatientData = {

@@ -59,7 +59,10 @@ const AssessmentFormTwo = ({ onSubmit }) => { // Receive onSubmit as a prop
     // Handle form submission
 const handleSubmit = (event) => {
     event.preventDefault();
-
+    if (!patientData.patient_sex) {
+      alert("Please select the patient's sex.");
+      return;
+    }
     // Data type conversions and validation
     const updatedPatientData = {
         ...patientData,
