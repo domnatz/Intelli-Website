@@ -81,7 +81,7 @@ const MonthlyReport = () => {
                     fontWeight: 'bold', 
                     mb: 1, // Adjust margin bottom
                     color: '#3F4662', 
-                    mt: 2 // Add margin top
+                    mt: 5 // Add margin top
                   }} 
                 >
                   Monthly Patients
@@ -98,7 +98,6 @@ const MonthlyReport = () => {
                         boxShadow: 3,
                         borderRadius: 2,
                         backgroundColor: theme.palette.background.paper,
-                        paddingTop: 4,
                       }}
                     >
                       <Line data={data} options={options} />
