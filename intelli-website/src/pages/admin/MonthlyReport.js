@@ -73,27 +73,37 @@ const MonthlyReport = () => {
           boxSizing: 'border-box',
         }}
       >
-        <Typography variant="h4" gutterBottom align="center" sx={{ fontWeight: 'bold', mb: 0.5, color: '#3F4662', mt: 0, mb: 0 }} >
-          Monthly Patients
-        </Typography>
-
-        <Grid container justifyContent="center" alignItems="center" sx={{ flexGrow: 1 }}>
-          <Grid item xs={12} md={11}>
-            <Box
-              sx={{
-                height: isMobile ? 300 : 500,
-                width: '100%',
-                m: 0, // Remove margin
-                p: 0, // Remove padding
-                boxShadow: 3,
-                borderRadius: 2,
-                backgroundColor: theme.palette.background.paper,
-              }}
-            >
-              <Line data={data} options={options} />
-            </Box>
-          </Grid>
-        </Grid>
+                          <Typography 
+                  variant="h4" 
+                  gutterBottom 
+                  align="center" 
+                  sx={{ 
+                    fontWeight: 'bold', 
+                    mb: 1, // Adjust margin bottom
+                    color: '#3F4662', 
+                    mt: 2 // Add margin top
+                  }} 
+                >
+                  Monthly Patients
+                </Typography>
+                
+                <Grid container justifyContent="center" alignItems="center" sx={{ flexGrow: 1, mt: 1 }}>
+                  <Grid item xs={12} md={11}>
+                    <Box
+                      sx={{
+                        height: isMobile ? 300 : 500,
+                        width: '100%',
+                        m: 0, // Remove margin
+                        p: 0, // Remove padding
+                        boxShadow: 3,
+                        borderRadius: 2,
+                        backgroundColor: theme.palette.background.paper,
+                      }}
+                    >
+                      <Line data={data} options={options} />
+                    </Box>
+                  </Grid>
+                </Grid>
       </Box>
     </Box>
   );
