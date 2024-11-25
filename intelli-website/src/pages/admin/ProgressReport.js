@@ -355,34 +355,36 @@ export default function PatientInfoForm() {
   const handleSubmitProgress = async (event) => {
     event.preventDefault();
 
+    // Check if all required fields are filled
+    if (!selfAware || !lessonEngagement || !improvementState || !errorFrequency || !progressQuality || !remarks) {
+        alert('Please fill out all fields');
+        return;
+    }
+
     // Initialize progressScore
     let progressScore = 0;
 
     try {
         const formData = new FormData();
 
-      // Use consistent string values for boolean fields
-      formData.append("self_aware", selfAware === "true" ? "true" : "false"); 
+        // Use consistent string values for boolean fields
+        formData.append("self_aware", selfAware === "true" ? "true" : "false"); 
+        formData.append("lesson_engagement", lessonEngagement || "");
+        formData.append("improvement_state", improvementState || "");
+        formData.append("error_frequency", errorFrequency || "");
+        formData.append("progress_quality", progressQuality || "");
+        formData.append("remarks", remarks || "");
 
-      formData.append("lesson_engagement", lessonEngagement || "");
-      formData.append("improvement_state", improvementState || "");
-      formData.append("error_frequency", errorFrequency || "");
-      formData.append("progress_quality", progressQuality || "");
-      formData.append("remarks", remarks || "");
         // Calculate progress score
         if (selfAware === "true") progressScore += 20;
-
         if (lessonEngagement === "high") progressScore += 30;
         else if (lessonEngagement === "medium") progressScore += 20;
         else if (lessonEngagement === "low") progressScore += 10;
-
         if (improvementState === "improving") progressScore += 30;
         else if (improvementState === "stable") progressScore += 20;
         else if (improvementState === "not improving") progressScore += 10;
-
         if (errorFrequency === "never") progressScore += 20;
         else if (errorFrequency === "sometimes") progressScore += 10;
-
         if (progressQuality === "excellent") progressScore += 20;
         else if (progressQuality === "good") progressScore += 10;
 
@@ -401,22 +403,22 @@ export default function PatientInfoForm() {
         });
 
         if (response.ok) {
-             // Show success alert
-      setShowSubmitAlert(true);
+            // Show success alert
+            setShowSubmitAlert(true);
 
-      // Clear form fields
-      setSelfAware(null);
-      setLessonEngagement(null);
-      setImprovementState(null);
-      setErrorFrequency(null);
-      setProgressQuality(null);
-      setRemarks("");
-      setSelectedFile(null);
+            // Clear form fields
+            setSelfAware(null);
+            setLessonEngagement(null);
+            setImprovementState(null);
+            setErrorFrequency(null);
+            setProgressQuality(null);
+            setRemarks("");
+            setSelectedFile(null);
 
-      // Hide alert after 3 seconds
-      setTimeout(() => {
-        setShowSubmitAlert(false);
-      }, 3000);
+            // Hide alert after 3 seconds
+            setTimeout(() => {
+                setShowSubmitAlert(false);
+            }, 3000);
         } else {
             console.error("Error updating progress:", response.status);
             // Optional: Display an error message to the user
@@ -427,7 +429,6 @@ export default function PatientInfoForm() {
     }
     setProgressScore(progressScore);
 };
-
 
   const handleFileChange = (event) => {
     setSelectedFile(event.target.files[0]);
